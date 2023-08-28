@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 using LibraryOfSparta.Classes;
 using LibraryOfSparta.Common;
@@ -12,8 +13,6 @@ class Program
     {
         Awake();
         Start();
-
-        return;
     }
 
     static void Awake()
@@ -25,18 +24,17 @@ class Program
         Core.Init();
     }
 
-    static async void Start()
+    static void Start()
     {
         while (applicationQuit == false)
         {
             Update();
-            
-            Thread.Sleep(100);
+
+            Thread.Sleep(500);
         }
     }
 
     static void Update()
     {
-
     }
 }
