@@ -368,23 +368,31 @@ namespace LibraryOfSparta.Classes
             char side = '|';
             char bar = '█';
 
+            int enemyHP = 800;
+            int enemyMaxHp = 1000;
 
             Console.SetCursorPosition(pivotX, pivotY);
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("체력 : 800/1000");
+            Console.Write("체력 : {0}/{1}", enemyHP, enemyMaxHp);
             Console.ResetColor();
 
             Console.SetCursorPosition(pivotX, pivotY + 1);
             Console.Write(side);
             Console.ForegroundColor = ConsoleColor.Red;
 
-            for (int i = 0; i < pivotMaxX - 10; i++)
+            int startPivotX = (pivotX + 1);
+            int endPivotX   = ((pivotX + 1) + (50  * (enemyHP / enemyMaxHp)));
+            for (int i = startPivotX; i < endPivotX; i++)
             {
+                Console.SetCursorPosition(i, pivotY + 2);
                 Console.Write(bar);
             }
             Console.ResetColor();
+
+
             for (int i = 0; i < 10; i++)
             {
+                Console.SetCursorPosition(i, pivotY + 2);
                 Console.Write(' ');
             }
             Console.ResetColor();
