@@ -309,6 +309,7 @@ namespace LibraryOfSparta.Classes
 
             Console.Write('|');
             Console.ForegroundColor = ConsoleColor.Green;
+            int tokenSize = 0;
             for (int i = 0; i < playerToken; i++)
             {
                 Console.Write(token);
@@ -327,90 +328,84 @@ namespace LibraryOfSparta.Classes
 
             Console.Write('|');
             Console.ForegroundColor = ConsoleColor.Red;
-            for (int i = 0; i < enemyToken; i++)
+            tokenSize = 0;
+            for (int i = rightBottomX+1; i < enemyToken; i++)
             {
+                Console.SetCursorPosition(i+tokenSize, rightBottomY + 8);
                 Console.Write(token);
+                tokenSize+= token.Length;
             }
             Console.ResetColor();
             Console.SetCursorPosition(rightBottomX + 35, rightBottomY + 8);
             Console.Write('|');
 
             Console.SetCursorPosition(rightBottomX, rightBottomY + 12);
-            Console.Write("A. 메뉴로 돌아가기");
+            Console.Write("A. 입구로 돌아가기");
         }
 
-        public void RenderEnemyName()
+        public void RenderEnemyName(string location = "총류의 층 9F", string enemyName = "박종민 매니저")
         {
             int pivotX = 34;
             int pivotY = 2;
             int pivotMaxX = 80;
-            char tb = '─';
 
             Console.SetCursorPosition(3, pivotY);
-            Console.Write("총류의 층 10F");
+            Console.Write(location);
             Console.SetCursorPosition(pivotX, pivotY);
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("박종민 매니저");
+            Console.Write(enemyName);
             Console.ResetColor();
-            Console.SetCursorPosition(pivotX, pivotY + 1);
-            for (int i = 2; i < pivotMaxX; i++)
-            {
-                Console.SetCursorPosition(i, pivotY + 1);
-                Console.Write(tb);
-            }
+            Console.SetCursorPosition(2, pivotY + 1);
+            string line = "──────────────────────────────────────────────────────────────────────────────";
+
+            Console.Write(line);
         }
 
-        public void RenderEnemyHPBar()
+        public void RenderEnemyHPBar(int enemyHP = 1000, int enemyMaxHP = 1000)
         {
-            int pivotX = 3;
-            int pivotY = 4;
+            int pivotX    = 3;
+            int pivotY    = 4;
             int pivotMaxX = 50;
-            char side = '|';
-            char bar = '█';
-
-            int enemyHP = 800;
-            int enemyMaxHp = 1000;
+            char side     = '|';
+            char bar      = '█';
 
             Console.SetCursorPosition(pivotX, pivotY);
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("체력 : {0}/{1}", enemyHP, enemyMaxHp);
-            Console.ResetColor();
+            Console.Write("체력 : {0}/{1}", enemyHP, enemyMaxHP);
+
+            int percentage  = (int)(pivotMaxX * ((double)enemyHP / enemyMaxHP));
 
             Console.SetCursorPosition(pivotX, pivotY + 1);
+            Console.ResetColor();
             Console.Write(side);
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            int startPivotX = (pivotX + 1);
-            int endPivotX   = ((pivotX + 1) + (50  * (enemyHP / enemyMaxHp)));
-            for (int i = startPivotX; i < endPivotX; i++)
+            for (int i = 0; i < percentage; i++)
             {
-                Console.SetCursorPosition(i, pivotY + 2);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.SetCursorPosition(i + 4, pivotY + 1);
                 Console.Write(bar);
             }
-            Console.ResetColor();
 
-
-            for (int i = 0; i < 10; i++)
+            for (int i = percentage; i < pivotMaxX; i++)
             {
-                Console.SetCursorPosition(i, pivotY + 2);
+                Console.SetCursorPosition(i+4, pivotY + 1);
                 Console.Write(' ');
             }
+            Console.SetCursorPosition(pivotMaxX+4, pivotY + 1);
             Console.ResetColor();
             Console.Write(side);
         }
 
-        public void RenderEnemyATBBar(int enemyATB = 30)
+        public void RenderEnemyATBBar(string enemySkillName = "안녕하세요?", int enemyATB = 30, int enemyMaxATB = 50)
         {
-            int pivotX = 3;
-            int pivotY = 6;
+            int pivotX    = 3;
+            int pivotY    = 6;
             int pivotMaxX = 50;
-            char side = '|';
-            char bar  = '█';
-
+            char side     = '|';
+            char bar      = '█';
 
             Console.SetCursorPosition(pivotX, pivotY);
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("안녕하세요?");
+            Console.Write(enemySkillName);
             Console.ResetColor();
 
             Console.SetCursorPosition(pivotX, pivotY + 1);
@@ -428,7 +423,6 @@ namespace LibraryOfSparta.Classes
             for (int i = enemyATB; i < pivotMaxX; i++)
             {
                 Console.SetCursorPosition(pivotX + i, pivotY + 1);
-                //Console.SetCursorPosition(pivotX + i, pivotY + 1);
                 Console.Write(' ');
             }
             Console.ResetColor();
