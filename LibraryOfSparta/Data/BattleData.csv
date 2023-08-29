@@ -1,0 +1,10 @@
+NAME,ENEMY_NAME,BGM_TAG,SKILL_PATTERN,ENEMY_HP,FLOOR_DIALOG,REWARD_CARD,VICTORY_SFX,DEFEAT_SFX
+TIL의 층,장윤서 매니저,Malkuth,0_1_0_0_1_2,250,,"0,1,2",,
+게임 음악의 층,강인 튜터,Yesod,3_4_5_4_3_4_6_4_5_4,500,,"3,4,5",,
+휴식의 층,이한별 튜터,Hod,7,300,,6,,
+,,Netzach,,650,,"7,8",,
+,,Tiphereth,,1000,,"9,10,11",,
+,박종민 매니저,Gebura,,2500,,"12,13,14",,
+,,Chesed,,1800,,"14,15",,
+알고리즘의 층,김영호 튜터,Hokma,,2000,,16,,
+,박종민 매니저,Keter,,5000,,17,,
