@@ -9,10 +9,13 @@ public class DeckSetting
 {
 
     List<Card> myCrad = new List<Card>();
-    Card[] myDeck = new Card[10];
+    List<Card> myDeck = new List<Card>();
 
     int page = 1;
     int cursor = 0;
+
+    bool cursor_is_mycard = true;
+
     string input;
 
     public void Init()
@@ -104,7 +107,7 @@ public class DeckSetting
  │        \_____/\__|__/\__|\_/|_____/   \___/\__|__/\__/   \_____/
 ");
         }//CARD INFO
-    }// 메인 틀
+    }
 
     void InventoryPanel()
     {
@@ -212,23 +215,43 @@ public class DeckSetting
             }
             Console.WriteLine("┘");
         }// 설명 창 가장 아래
-        //이름 파워 타입 코스트 설명
+
 
         try
         {
-            Console.SetCursorPosition(10, Define.SCREEN_Y - 15);
-            Console.WriteLine("카드  이름 : {0}", myCrad[(page - 1) * 10 + +cursor].name);
-            Console.SetCursorPosition(10, Define.SCREEN_Y - 13);
-            Console.WriteLine("카드  파워 : {0}", myCrad[(page - 1) * 10 + +cursor].power);
-            Console.SetCursorPosition(10, Define.SCREEN_Y - 12);
-            Console.WriteLine("카드  타입 : {0}", myCrad[(page - 1) * 10 + +cursor].type);
-            Console.SetCursorPosition(10, Define.SCREEN_Y - 11);
-            Console.WriteLine("카드 코스트: {0}", myCrad[(page - 1) * 10 + +cursor].cost);
-            Console.SetCursorPosition(10, Define.SCREEN_Y - 10);
-            Console.WriteLine("카드  설명 : {0}", myCrad[(page - 1) * 10 + +cursor].dialog);
+            if (cursor_is_mycard)
+            {
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 15);
+                Console.WriteLine("카드  이름 : {0}", myCrad[(page - 1) * 10 + cursor].name);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 13);
+                Console.WriteLine("카드  파워 : {0}", myCrad[(page - 1) * 10 + cursor].power);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 12);
+                Console.WriteLine("카드  타입 : {0}", myCrad[(page - 1) * 10 + cursor].type);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 11);
+                Console.WriteLine("카드 코스트: {0}", myCrad[(page - 1) * 10 + cursor].cost);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 10);
+                Console.WriteLine("카드  설명 : {0}", myCrad[(page - 1) * 10 + cursor].dialog);
+            }
+            else
+            {
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 15);
+                Console.WriteLine("카드  이름 : {0}", myDeck[cursor].name);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 13);
+                Console.WriteLine("카드  파워 : {0}", myDeck[cursor].power);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 12);
+                Console.WriteLine("카드  타입 : {0}", myDeck[cursor].type);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 11);
+                Console.WriteLine("카드 코스트: {0}", myDeck[cursor].cost);
+                Console.SetCursorPosition(10, Define.SCREEN_Y - 10);
+                Console.WriteLine("카드  설명 : {0}", myDeck[cursor].dialog);
+            }
         }
-        catch { }
+        catch
+        {
+
+        }
     }
+
     void MyCardDrow()
     {
         for (int i = 0; i < 10; i++)
@@ -244,7 +267,7 @@ public class DeckSetting
 
     void MyDeckDrow()
     {
-        for (int i = 0; i<myDeck.Length; i++)
+        for (int i = 0; i<myDeck.Count; i++)
         {
             Console.SetCursorPosition(73, 8 + i* 2);
             Console.Write("{0}", myDeck[i].name);
@@ -253,8 +276,16 @@ public class DeckSetting
 
     void CursorDrow()
     {
-        Console.SetCursorPosition(10,(cursor * 2) + 8);
-        Console.WriteLine("▶");
+        if (cursor_is_mycard)
+        {
+            Console.SetCursorPosition(10, (cursor * 2) + 8);
+            Console.WriteLine("▶");
+        }
+        else
+        {
+            Console.SetCursorPosition(70, (cursor * 2) + 8);
+            Console.WriteLine("▶");
+        }
 
     }
 
@@ -283,10 +314,12 @@ public class DeckSetting
             {
                 Input();
             }
-        }
-        else if (input == "W")
+        }//다음 페이지
+        else if (input == "w")
         {
             Console.SetCursorPosition(10, (cursor * 2) + 8);
+            Console.WriteLine("  ");
+            Console.SetCursorPosition(70, (cursor * 2) + 8);
             Console.WriteLine("  ");
             if (cursor > 0)
             {
@@ -297,10 +330,13 @@ public class DeckSetting
             {
                 cursor = 9;
             }
-        }
-        else if (input == "S")
+
+        }//커서 위로
+        else if (input == "s")
         {
             Console.SetCursorPosition(10, (cursor * 2) + 8);
+            Console.WriteLine("  ");
+            Console.SetCursorPosition(70, (cursor * 2) + 8);
             Console.WriteLine("  ");
             if (cursor < 9)
             {
@@ -310,21 +346,70 @@ public class DeckSetting
             {
                 cursor = 0;
             }
-                }
-        else if (input == " ")
+                }//커서 아래로
+        else if (input == "a")
+        {
+            Console.SetCursorPosition(10, (cursor * 2) + 8);
+            Console.WriteLine("  ");
+            Console.SetCursorPosition(70, (cursor * 2) + 8);
+            Console.WriteLine("  ");
+            cursor_is_mycard = true;
+        }// 커서 내 카드로
+        else if (input == "d")
+        {
+            Console.SetCursorPosition(10, (cursor * 2) + 8);
+            Console.WriteLine("  ");
+            Console.SetCursorPosition(70, (cursor * 2) + 8);
+            Console.WriteLine("  ");
+            cursor_is_mycard = false;
+        }// 커서 내 덱으로
+        else if (input == "e")
         {
             MyDeckAdd();
-        }
+        }// 장착
+        else if (input == "q")
+        {
+            CardRemove();
+
+        }// 삭제
         else
         {
             Input();
         }
+
     }
+
+    void CardRemove()
+    {
+        if (cursor_is_mycard)
+        {
+            Card card = new Card();
+            card = myCrad[(page - 1) * 10 + cursor];
+            myCrad.Remove(card);
+            myDeck.Remove(card);
+            Console.SetCursorPosition(13, 8 + myDeck.Count * 2);
+            Console.WriteLine("                                               ");
+        }
+        else
+        {
+            Card card = new Card();
+            card = myDeck[cursor];
+            myDeck.Remove(card);
+            Console.SetCursorPosition(73, 8 + myDeck.Count * 2);
+            Console.WriteLine("                                               ");
+        }
+
+    }// 카드 삭제
+
     void MyDeckAdd()
     {
-        myDeck[0] = myCrad[(page - 1) * 10 + +cursor];
-        MyDeckDrow();
-    }
+        Card card = new Card();
+        card = myCrad[(page - 1) * 10 + cursor];
+        if (myDeck.Count < 10 && cursor_is_mycard)
+        {
+            myDeck.Add(card);
+        }
+    }// 덱 완
 
     void Input()
     {
@@ -348,7 +433,18 @@ public class DeckSetting
         myCrad.Add(new Card("공격과 수비", 12, (CardType)3, 2, "적에게 12 대미지를 주고 다음 받는 대미지를 6 경감시킨다"));
         myCrad.Add(new Card("집중 공격", 18, (CardType)0, 2, "적에게 18 대미지를 준다"));
         myCrad.Add(new Card("무거운 공격", 20, (CardType)0, 1, "적에게 20 대미지를 준다"));
-    }
+
+        myDeck.Add(new Card("가벼운 공격", 1, (CardType)0, 1, "적에게 10 대미지를 준다"));
+        myDeck.Add(new Card("회피", 2, (CardType)1, 1, "8 이하의 다음 공격은 무조건 회피한다"));
+        myDeck.Add(new Card("가벼운 방어", 3, (CardType)2, 1, "다음 받는 대미지를 5 경감 시킨다"));
+        myDeck.Add(new Card("공격과 수비", 4, (CardType)3, 2, "적에게 12 대미지를 주고 다음 받는 대미지를 6 경감시킨다"));
+        myDeck.Add(new Card("집중 공격", 5, (CardType)0, 2, "적에게 18 대미지를 준다"));
+        myDeck.Add(new Card("가벼운 공격", 6, (CardType)0, 1, "적에게 10 대미지를 준다"));
+        myDeck.Add(new Card("회피", 7, (CardType)1, 1, "8 이하의 다음 공격은 무조건 회피한다"));
+        myDeck.Add(new Card("가벼운 방어", 8, (CardType)2, 1, "다음 받는 대미지를 5 경감 시킨다"));
+        myDeck.Add(new Card("공격과 수비", 9, (CardType)3, 2, "적에게 12 대미지를 주고 다음 받는 대미지를 6 경감시킨다"));
+
+    }// 테스트 카드 세팅
 }
 
 struct Card
