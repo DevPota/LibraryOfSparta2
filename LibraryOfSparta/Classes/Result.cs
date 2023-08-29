@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using D = LibraryOfSparta.Common.Define;
 using System.Windows.Markup;
+using LibraryOfSparta.Common;
+using System.Xml.Linq;
 
 namespace LibraryOfSparta
 {
@@ -14,7 +16,7 @@ namespace LibraryOfSparta
     {
         public void DrawWalls()
         {
-            Console.SetWindowSize(D.SCREEN_X + 3, D.SCREEN_Y + 3);
+            Console.SetWindowSize(Define.SCREEN_X + 3, Define.SCREEN_Y + 3);
 
             Console.SetCursorPosition(0, 0);
             Console.Write("┏");
@@ -69,25 +71,41 @@ namespace LibraryOfSparta
             Console.SetCursorPosition(49, 11);
             Console.Write("새로운 카드를 획득하였습니다.");
 
-            Console.SetCursorPosition(45, 14);
-            Console.Write(@" __________________________________");
+            Console.SetCursorPosition(36, 14);
+            Console.Write(@" _________________________________");
             for (int i = 15; i < 37; i++)
             {
-                Console.SetCursorPosition(45, i);
-                Console.Write(@"|                                  |");
+                Console.SetCursorPosition(36, i);
+                Console.Write(@"|                                 |");
             }
-            Console.SetCursorPosition(45, 37);
-            Console.Write(@"|__________________________________|");
+            Console.SetCursorPosition(36, 37);
+            Console.Write(@"|_________________________________|");
 
-            Console.SetCursorPosition(57, 22);
+            Console.SetCursorPosition(80, 16);
+            Console.Write("보유중인 카드");
+            /*
+            for (int i = 17,int j = 17; i < 보유중인카드갯수; i++)
+            {
+                if (// 보유목록에 안뜬 카드라면)
+                {
+                    Console.SetCursorPosition(80, j);
+                    목록에 카드 이름 추가
+                    j++;
+                }
+                else // 보유목록에 이미 있는 카드라면
+                {
+                    그 카드 갯수 1증가
+                }
+            }
+            */
+
+            Console.SetCursorPosition(47, 22);
             Console.Write($"완벽한 타격");       // 변수
-            Console.SetCursorPosition(52, 28);
+            Console.SetCursorPosition(42, 28);
             Console.Write($"적에게 피해를 20 줍니다.");       // 변수
 
-            Console.SetCursorPosition(51, 41);
+            Console.SetCursorPosition(59, 41);
             Console.Write($"1. 획득");
-            Console.SetCursorPosition(65, 41);
-            Console.Write($"2. 넘기기");
 
             Console.SetCursorPosition(2, 46);
             Console.Write(">>");
@@ -98,18 +116,25 @@ namespace LibraryOfSparta
             switch (parseInput)
             {
                 case 1:
-                    AddCard();
-                    break;
-                case 2:
-                    Console.SetCursorPosition(2, 47);
-                    Console.Write("카드를 넘깁니다.");
+                    AddCardClass.AddCardReply();
+                    AddCardClass.AddCard();
                     break;
             }
-        }
-        public void AddCard()
-        {
-            Console.SetCursorPosition(1, 47);
-            Console.Write("카드를 획득했습니다.");
+
+            Console.SetCursorPosition(55, 41);
+            Console.Write($"1. 던전 선택창으로");
+            Console.SetCursorPosition(2, 48);
+            Console.Write(">>");
+
+            string input2 = Console.ReadLine();
+            int parseInput2 = int.Parse(input);
+
+            switch (parseInput2)
+            {
+                case 1:
+                    // 던전 선택창으로
+                    break;
+            }
         }
     }
     public class Card
@@ -119,37 +144,37 @@ namespace LibraryOfSparta
         public string TYPE { get; set; }
         public string COST { get; set; }
         public string DIALOG { get; set; }
+        // public override string ToString() => NAME;
+    }
 
-        public Card(string name, string power, string type, string cost, string dialog)
+    public class AddCardClass
+    {
+        public static void AddCardReply()
         {
-            NAME = name;
-            POWER = power;
-            TYPE = type;
-            COST = cost;
-            DIALOG = dialog;
+            Console.SetCursorPosition(1, 47);
+            Console.Write("카드를 획득했습니다.");
         }
-        public void getCard()
+        public static void AddCard()
         {
-            StreamReader reward = new StreamReader("CardBase.csv");
-
-            List<Card> cards = new List<Card>();
-
-            int count = 0;
-
-            Console.SetCursorPosition(5, 2);
-
-            while (!reward.EndOfStream)
+            using(var reward = new StreamReader("CardBase.csv"))
             {
-                string line = reward.ReadLine();
-                string[] values = line.Split(',');
-                cards.Add(new Card(values[0], values[1], values[2], values[3], values[4]));
-                count++;
+                List<Card> CardList = new List<Card>();
+
+                int count = 0;
+
+                Console.SetCursorPosition(5, 2);
+
+                while (!reward.EndOfStream)
+                {
+                    string line = reward.ReadLine();
+                    string[] values = line.Split(',');
+                    CardList.Add(new Card() { NAME = $"{values[0]}", POWER = $"{values[1]}", TYPE = $"{values[2]}", COST = $"{values[3]}", DIALOG = $"{values[4]}" });
+
+                    Console.WriteLine(values);
+                    Console.WriteLine(CardList);
+                    count++;
+                }
             }
-
-            Random rand = new Random();
-            int random_number = rand.Next(count);
-
-            Console.WriteLine($"{cards[random_number]}");
         }
     }
 }

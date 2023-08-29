@@ -9,6 +9,7 @@ using LibraryOfSparta.Managers;
 class Program
 {
     static bool applicationQuit = false;
+    private static Result r = new Result();
 
     static void Main()
     {
@@ -23,6 +24,9 @@ class Program
         Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
 
         Core.Init();
+
+        r.DrawWalls();
+        r.ResultScene();
     }
 
     static void Start()
