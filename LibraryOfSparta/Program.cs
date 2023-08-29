@@ -22,10 +22,6 @@ class Program
         Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
 
         Core.Init();
-
-        Battle newBattle = new Battle();
-
-        newBattle.Init();
     }
 
     static void Start()
