@@ -21,7 +21,9 @@ class Program
         Console.OutputEncoding = Encoding.UTF8;
         Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
 
-        Core.Init();
+        //Core.Init();
+        DeckSetting deckSetting = new DeckSetting();
+        deckSetting.Init();
     }
 
     static void Start()
