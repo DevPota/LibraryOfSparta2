@@ -5,6 +5,15 @@ using LibraryOfSparta.Common;
 
 namespace LibraryOfSparta.Classes
 {
+    public enum BattleSitulation
+    {
+        NONE,
+        ATK,
+        BUFF,
+        VICTORY,
+        DEFEAT
+    }
+
     public class Battle
     {
         public void Init()
@@ -17,7 +26,6 @@ namespace LibraryOfSparta.Classes
             char lr = '│';
             char lb = '└';
             char rb = '┘';
-
 
             // Enemy
             int leftTopX = 1;
@@ -53,27 +61,6 @@ namespace LibraryOfSparta.Classes
                 Console.Write(tb);
             }
             Console.Write(rb);
-
-            // Draw enemy
-            RenderEnemyName();
-            RenderEnemyHPBar();
-            RenderEnemyATBBar();
-            DrawEnemy();
-
-            // Draw Card Queue
-            RenderCardQueue();
-            UpdateCardQueue();
-
-            // Draw Player ATB
-            RenderPlayerCostATBBar();
-            RenderPlayerDrawATBBar();
-
-            // battle status
-            RenderBattleDialog();
-            RenderplayerHPBar();
-            RenderPlayerStatus(null);
-            RenderPlayerBuffStatus();
-            RenderEmotionLevel();
         }
 
         public void RenderEnemyName(string location = "총류의 층 9F", string enemyName = "박종민 매니저")
@@ -161,22 +148,21 @@ namespace LibraryOfSparta.Classes
             Console.Write(side);
         }
 
-        public void DrawEnemy()
+        public void DrawEnemy(string path)
         {
-            int pivotX = 3;
-            int pivotY = 8;
-            int pivotMaxX = 77;
-            int pivotMaxY = 29;
+            int x = 3;
+            int y = 8;
+            int endY = 29;
 
-            string img = File.ReadAllText(Define.LOCAL_GAME_PATH + "/Images/Img_Keter.txt");
+            string img = File.ReadAllText(path);
 
             string[] lines = img.Split('\n');
 
-            Console.SetCursorPosition(pivotX, pivotY);
+            Console.SetCursorPosition(x, y);
 
-            for (int i = 0; i < pivotMaxY - pivotY; i++)
+            for (int i = 0; i < endY - y; i++)
             {
-                Console.SetCursorPosition(pivotX, pivotY + i);
+                Console.SetCursorPosition(x, y + i);
                 Console.Write(lines[i]);
             }
         }
@@ -241,7 +227,7 @@ namespace LibraryOfSparta.Classes
         {
             int x = 84;
             int y = 19;
-            int barLength = 21;
+            int barLength = 31;
 
             char side = '|';
             char bar  = '█';
@@ -259,14 +245,14 @@ namespace LibraryOfSparta.Classes
 
             for (int i = 1; i < playerCostFill; i++)
             {
-                Console.SetCursorPosition(x + i, y + 4);
+                Console.SetCursorPosition((x+1) + i, y + 4);
                 Console.Write(bar);
 
             }
             Console.ResetColor();
             for (int i = playerCostFill; i < barLength; i++)
             {
-                Console.SetCursorPosition(x + i, y + 4);
+                Console.SetCursorPosition((x+1) + i, y + 4);
                 Console.Write(' ');
 
             }
@@ -277,7 +263,7 @@ namespace LibraryOfSparta.Classes
         {
             int x = 84;
             int y = 24;
-            int barLength = 21;
+            int barLength = 31;
 
             char side = '|';
             char bar  = '█';
@@ -293,21 +279,21 @@ namespace LibraryOfSparta.Classes
             
             for (int i = 1; i < atbDrawFill; i++)
             {
-                Console.SetCursorPosition(x + i, y + 1);
+                Console.SetCursorPosition((x+1) + i, y + 1);
                 Console.Write(bar);
 
             }
             Console.ResetColor();
             for (int i = atbDrawFill; i < barLength; i++)
             {
-                Console.SetCursorPosition(x + i, y + 1);
+                Console.SetCursorPosition((x+1) + i, y + 1);
                 Console.Write(' ');
 
             }
             Console.Write(side);
         }
 
-        public void RenderplayerHPBar(int playerHP = 48, int playerMaxHP = 100)
+        public void RenderPlayerHPBar(int playerHP = 48, int playerMaxHP = 100)
         {
             // Draw HPBar
             int x = 3;
@@ -344,16 +330,37 @@ namespace LibraryOfSparta.Classes
             Console.Write("{0}/{1}", playerHP, playerMaxHP);
         }
 
-        public void RenderBattleDialog(string caster = "당신", string target = "박종민 매니저", string skillName = "가벼운 공격", int power = 10)
+        public void RenderBattleDialog(string caster = "당신", string target = "박종민 매니저", string skillName = "가벼운 공격", int power = 10, BattleSitulation situlation = BattleSitulation.NONE)
         {
             int x = 3;
             int y = 30;
 
+            
             Console.SetCursorPosition(x, y);
-            Console.Write("{0}의 {1}!", caster, skillName);
-            Console.SetCursorPosition(x, y + 1);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("{0}는 {1} 대미지를 받았다!", target, power);
+            
+
+            switch (situlation)
+            {
+                case BattleSitulation.NONE:
+                    Console.Write("{0}", caster);
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write("{0}", target);
+                    break;
+                case BattleSitulation.ATK:
+                    Console.Write("{0}의 {1}!", caster, skillName);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write("{0}는 {1} 대미지를 받았다!", target, power);
+                    break;
+                case BattleSitulation.BUFF:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("{0}의 {1}!", caster, skillName);
+                    break;
+                default:
+                    break;
+            }
+
+            
         }
 
         public void RenderPlayerStatus(Player player)
@@ -496,11 +503,6 @@ namespace LibraryOfSparta.Classes
 
             Console.SetCursorPosition(x, y + 12);
             Console.Write("A. 입구로 돌아가기");
-        }
-
-        public void Update()
-        {
-
         }
     }
 }

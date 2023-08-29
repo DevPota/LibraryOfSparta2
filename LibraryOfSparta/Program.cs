@@ -9,6 +9,8 @@ class Program
 {
     static bool applicationQuit = false;
 
+    static DeckSetting temp = new DeckSetting();
+
     static void Main()
     {
         Awake();
@@ -22,6 +24,9 @@ class Program
         Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
 
         Core.Init();
+        Core.RenderSystemUI();
+        temp.Init();
+        //GameManager.InitBattle(1);
     }
 
     static void Start()
@@ -30,11 +35,15 @@ class Program
         {
             Update();
 
-            Thread.Sleep(500);
+            Thread.Sleep(100);
         }
     }
 
     static void Update()
     {
+        temp.Update();
+        //GameManager.Update();
+
+        Core.ReleaseKey();
     }
 }
