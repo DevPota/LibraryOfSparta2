@@ -9,11 +9,18 @@ using D = LibraryOfSparta.Common.Define;
 using System.Windows.Markup;
 using LibraryOfSparta.Common;
 using System.Xml.Linq;
+using System.Reflection.Metadata.Ecma335;
+using LibraryOfSparta.Classes;
 
 namespace LibraryOfSparta
 {
     public class Result
     {
+        MyCard c = new MyCard();
+        RewardCard r = new RewardCard();
+        GetReward g = new GetReward();
+        Battle b = new Battle();
+
         public void DrawWalls()
         {
             Console.SetWindowSize(Define.SCREEN_X + 3, Define.SCREEN_Y + 3);
@@ -68,57 +75,47 @@ namespace LibraryOfSparta
             Console.SetCursorPosition(40, 8);
             Console.Write(@" \___/  \___/  \____/  \_/   \___/ \_| \_|  \_/");
 
-            Console.SetCursorPosition(49, 11);
-            Console.Write("새로운 카드를 획득하였습니다.");
+            c.MakeInventory();
+            c.ShowInventory();
 
-            Console.SetCursorPosition(36, 14);
-            Console.Write(@" _________________________________");
-            for (int i = 15; i < 37; i++)
-            {
-                Console.SetCursorPosition(36, i);
-                Console.Write(@"|                                 |");
-            }
-            Console.SetCursorPosition(36, 37);
-            Console.Write(@"|_________________________________|");
+            // 던전 선택창에서 스테이지 값 하나 받아와서 변경
 
-            Console.SetCursorPosition(80, 16);
-            Console.Write("보유중인 카드");
+            r.MakeReward();
+            r.GiveReward(3);
+            // r.GiveReward(b.RenderEmotionLevel());    나중엔 이거사용
+
             /*
-            for (int i = 17,int j = 17; i < 보유중인카드갯수; i++)
+            for (int i = 0; i < 10; i++)
             {
-                if (// 보유목록에 안뜬 카드라면)
-                {
-                    Console.SetCursorPosition(80, j);
-                    목록에 카드 이름 추가
-                    j++;
-                }
-                else // 보유목록에 이미 있는 카드라면
-                {
-                    그 카드 갯수 1증가
-                }
+                Console.SetCursorPosition(30, 15 + i*2);
+                Console.Write($"{r.GiveReward(i).NAME} - {r.GiveReward(i).DIALOG}");       // 0 대신 스테이지 변수값 지금은 모든 카드 나타내기
             }
             */
 
-            Console.SetCursorPosition(47, 22);
-            Console.Write($"완벽한 타격");       // 변수
-            Console.SetCursorPosition(42, 28);
-            Console.Write($"적에게 피해를 20 줍니다.");       // 변수
-
             Console.SetCursorPosition(59, 41);
-            Console.Write($"1. 획득");
+            Console.Write("1. 획득");
 
             Console.SetCursorPosition(2, 46);
             Console.Write(">>");
 
-            string input = Console.ReadLine();
-            int parseInput = int.Parse(input);
-
-            switch (parseInput)
+            while(true)
             {
-                case 1:
-                    AddCardClass.AddCardReply();
-                    AddCardClass.AddCard();
+                string input = Console.ReadLine();
+                int parseInput = int.Parse(input);
+
+                if (parseInput == 1)
+                {
+                    g.GetRewardCard();
                     break;
+                }
+                else
+                {
+                    Console.SetCursorPosition(2, 46);
+                    Console.Write("                                               ");
+                    Console.SetCursorPosition(2, 46);
+                    Console.Write("잘못된 입력입니다. >>");
+                    continue;
+                }
             }
 
             Console.SetCursorPosition(55, 41);
@@ -126,32 +123,154 @@ namespace LibraryOfSparta
             Console.SetCursorPosition(2, 48);
             Console.Write(">>");
 
-            string input2 = Console.ReadLine();
-            int parseInput2 = int.Parse(input);
-
-            switch (parseInput2)
+            while (true)
             {
-                case 1:
+                string input2 = Console.ReadLine();
+                int parseInput2 = int.Parse(input2);
+
+                if (parseInput2 == 1)
+                {
                     // 던전 선택창으로
                     break;
+                }
+                else
+                {
+                    Console.SetCursorPosition(2, 48);
+                    Console.Write("                                               ");
+                    Console.SetCursorPosition(2, 48);
+                    Console.Write("잘못된 입력입니다. >>");
+                    continue;
+                }
             }
         }
     }
     public class Card
     {
         public string NAME { get; set; }
-        public string POWER { get; set; }
-        public string TYPE { get; set; }
-        public string COST { get; set; }
+        public int POWER { get; set; }
+        public int TYPE { get; set; }
+        public int COST { get; set; }
         public string DIALOG { get; set; }
-        // public override string ToString() => NAME;
     }
+    public class Reward // 층별 보상 카드
+    {
+        public List<Card> RewardCard = new();
+        public void AddCard(Card card)
+        {
+            RewardCard.Add(card);
+        }
+    }
+    
+    public class Inventory // 인벤토리
+    {
+        public List<Card> InventoryCard = new();
+        public void AddCard(Card card)
+        {
+            InventoryCard.Add(card);
+        }
+    }
+    public class MyCard // 보유 카드 목록
+    {
+        public static Inventory Inventories = new();
+        public void MakeInventory()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Inventories.AddCard(new Card() { NAME = "타격", POWER = 6, TYPE = 0, COST = 1, DIALOG = "피해를 6 줍니다." });
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                Inventories.AddCard(new Card() { NAME = "수비", POWER = 5, TYPE = 1, COST = 1, DIALOG = "방어도를 5 얻습니다." });
+            }
+            for (int i = 0; i < 1; i++)
+            {
+                Inventories.AddCard(new Card() { NAME = "회피", POWER = 8, TYPE = 2, COST = 1, DIALOG = "8 이하의 피해를 한번 회피합니다." });
+            } 
+        }
+        public void ShowInventory()
+        {
+            int strike = 1; int defend = 1; int evasion = 1;    // 타격 수비 회피 개수..더 좋은방법없을까
 
+            Console.SetCursorPosition(110, 16);
+            Console.Write("보유중인 카드");
+
+            foreach (Card card in Inventories.InventoryCard)
+            {
+                switch (card.NAME)
+                {
+                    case "타격":
+                            Console.SetCursorPosition(110, 18);          // 하드코딩
+                            Console.Write($"{card.NAME} X {strike}");
+                            strike++;
+                        break;
+                    case "수비":
+                            Console.SetCursorPosition(110, 19);
+                            Console.Write($"{card.NAME} X {defend}");
+                            defend++;
+                        break;
+                    case "회피":
+                            Console.SetCursorPosition(110, 20);
+                            Console.Write($"{card.NAME} X {evasion}");
+                            evasion++;
+                        break;
+                }
+            }
+        }
+    }
+    public class RewardCard // 스테이지별 보상 카드 목록
+    {
+        Battle b = new Battle();
+        public static Reward Rewards = new();
+        public void MakeReward()
+        {
+            Rewards.AddCard(new Card() { NAME = "무모한 타격", POWER = 6, TYPE = 0, COST = 0, DIALOG = "피해를 4 줍니다." });
+            Rewards.AddCard(new Card() { NAME = "가벼운 회피", POWER = 4, TYPE = 2, COST = 0, DIALOG = "5 이하의 피해를 한번 회피합니다." });
+            Rewards.AddCard(new Card() { NAME = "직감", POWER = 3, TYPE = 1, COST = 0, DIALOG = "방어도를 3 얻습니다." });
+            Rewards.AddCard(new Card() { NAME = "철의 파동", POWER = 5, TYPE = 3, COST = 1, DIALOG = "피해를 5 주고 방어도를 5 얻습니다." });
+            Rewards.AddCard(new Card() { NAME = "돌진", POWER = 10, TYPE = 3, COST = 2, DIALOG = "피해를 10 주고 방어도를 10 얻습니다." });
+            Rewards.AddCard(new Card() { NAME = "대학살", POWER = 16, TYPE = 0, COST = 2, DIALOG = "피해를 16 줍니다." });
+            Rewards.AddCard(new Card() { NAME = "유령 갑옷", POWER = 10, TYPE = 1, COST = 1, DIALOG = "방어도를 10 얻습니다." });
+            Rewards.AddCard(new Card() { NAME = "구르기", POWER = 13, TYPE = 2, COST = 2, DIALOG = "13 이하의 피해를 한번 회피합니다." });
+            Rewards.AddCard(new Card() { NAME = "화염 방패", POWER = 16, TYPE = 1, COST = 2, DIALOG = "방어도를 16 얻습니다." });
+            Rewards.AddCard(new Card() { NAME = "몽둥이질", POWER = 28, TYPE = 0, COST = 3, DIALOG = "피해를 28 줍니다." });
+        }
+        public Card GiveReward(int eELevel)                 // return 이 아니라 카드1개 2개 3개 띄우는 식으로 해야함
+        {
+            Random rand = new Random();
+            int random_number = rand.Next(10);
+
+            if (eELevel < 2)
+            {
+                return Rewards.RewardCard[random_number];
+            }
+            else if (eELevel >= 2 && eELevel < 4)
+            {
+                return Rewards.RewardCard[random_number];
+                return Rewards.RewardCard[random_number];
+            }
+            else
+            {
+                return Rewards.RewardCard[random_number];
+                return Rewards.RewardCard[random_number];
+                return Rewards.RewardCard[random_number];
+            }
+        }
+    }
+    public class GetReward
+    {
+        public void GetRewardCard()
+        {
+            Console.SetCursorPosition(2, 47);
+            Console.Write("카드를 획득했습니다.");
+
+        }
+    }
+    /*
     public class AddCardClass
     {
         public static void AddCardReply()
         {
-            Console.SetCursorPosition(1, 47);
+            Console.SetCursorPosition(2, 47);
             Console.Write("카드를 획득했습니다.");
         }
         public static void AddCard()
@@ -177,6 +296,7 @@ namespace LibraryOfSparta
             }
         }
     }
+    */
 }
 
 

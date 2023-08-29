@@ -426,7 +426,7 @@ namespace LibraryOfSparta.Classes
             Console.ResetColor();
         }
 
-        public void RenderEmotionLevel(int pELevel = 1, int eELevel = 2, int pToken = 4, int eToken = 1)
+        public int RenderEmotionLevel(int pELevel = 1, int eELevel = 2, int pToken = 4, int eToken = 1)
         {
             int x = 82;
             int y = 31;
@@ -496,6 +496,8 @@ namespace LibraryOfSparta.Classes
 
             Console.SetCursorPosition(x, y + 12);
             Console.Write("A. 입구로 돌아가기");
+
+            return eELevel;
         }
 
         public void Update()
