@@ -66,26 +66,42 @@ namespace LibraryOfSparta.Classes
             set { _length = value; }
         }
 
-        public bool LoadMediaFile(string filename, string alias)
+        public bool LoadMediaFile()
         {
-            _medialocation = filename;
-            _alias = alias;
             StopPlaying();
-            CloseMediaFile();
-            string Pcommand = "open \"" + filename + "\" alias " + alias;
+            string Pcommand = "open \"" + _medialocation + "\" alias " + Alias;
             int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
             _isloaded = (ret == 0) ? true : false;
             if (_isloaded)
             {
                 _deviceid = mciGetDeviceID(_alias);
+                _length = GetLength();
+            }
+            return _isloaded;
+        }
+
+        public bool LoadMediaFile(string filename, string alias)
+        {
+            StopPlaying();
+            CloseMediaFile();
+            _medialocation = filename;
+            _alias = alias;
+            string Pcommand = "open \"" + _medialocation + "\" alias " + _alias;
+            int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
+            _isloaded = (ret == 0) ? true : false;
+
+            if (_isloaded == true)
+            {
+                _deviceid = mciGetDeviceID(_alias);
                 _length   = GetLength();
             }
+
             return _isloaded;
         }
 
         public void PlayFromStart()
         {
-            if (_isloaded)
+            if (_isloaded == true)
             {
                 string Pcommand = "play " + Alias + " from 0";
                 int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
@@ -94,7 +110,7 @@ namespace LibraryOfSparta.Classes
 
         public void PlayFromStart(IntPtr callback)
         {
-            if (_isloaded)
+            if (_isloaded == true)
             {
                 string Pcommand = "play " + Alias + " from 0 notify";
                 int ret = mciSendString(Pcommand, null, 0, callback);
@@ -118,7 +134,7 @@ namespace LibraryOfSparta.Classes
             {
                 return;
             }
-            LoadMediaFile(_medialocation, _alias);
+            LoadMediaFile();
             PlayFromStart();
             timer.Interval = Length;
         }
@@ -140,54 +156,87 @@ namespace LibraryOfSparta.Classes
 
         public void CloseMediaFile()
         {
-            string Pcommand = "close " + Alias;
-            int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
-            _isloaded = false;
-
+            if(_isloaded == true)
+            {
+                string Pcommand = "close " + Alias;
+                int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
+                _isloaded = false;
+                Alias = null;
+                _medialocation = null;
+            }
         }
 
         public void StopPlaying()
         {
-            string Pcommand = "stop " + Alias;
-            int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
+            if(_isloaded == true)
+            {
+                string Pcommand = "stop " + Alias;
+                int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
+            }
         }
 
         public void ForceStopAll()
         {
-            string Pcommand = "stop " + Alias;
-            int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
-            isLooping = false;
-            timer.Elapsed -= Loop;
-            timer.Stop();
-            CloseMediaFile();
+            if (timer == null)
+            {
+                return;
+            }
+            else
+            {
+                StopTimer();
+            }
+
+            if (_isloaded == true)
+            {
+                string Pcommand = "stop " + Alias;
+                int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
+                isLooping = false;
+                CloseMediaFile();
+            }
         }
 
         public void StopTimer()
         {
             isLooping = false;
             timer.Elapsed -= Loop;
+            timer.Interval = int.MaxValue;
             timer.Stop();
+            timer.AutoReset = false;
+            timer = null;
         }
 
         public int GetLength()
         {
-            StringBuilder lengthBuf = new StringBuilder(256);
-            string PCommand = "status " + Alias + " length";
-            mciSendString(PCommand, lengthBuf, lengthBuf.Capacity, IntPtr.Zero);
+            if(_isloaded == true)
+            {
+                StringBuilder lengthBuf = new StringBuilder(256);
+                string PCommand = "status " + Alias + " length";
+                mciSendString(PCommand, lengthBuf, lengthBuf.Capacity, IntPtr.Zero);
 
-            int length = 0;
-            int.TryParse(lengthBuf.ToString(), out length);
-
-            return length;
+                int length = 0;
+                int.TryParse(lengthBuf.ToString(), out length);
+                return length;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public int GetCurentMilisecond()
         {
-            StringBuilder returnData = new StringBuilder(256);
-            string Pcommand = "status "+ Alias + " position";
-            int error = mciSendString(Pcommand, returnData,
-                                  returnData.Capacity, IntPtr.Zero);
-            return int.Parse(returnData.ToString());
+            if(_isloaded == true)
+            {
+                StringBuilder returnData = new StringBuilder(256);
+                string Pcommand = "status " + Alias + " position";
+                int error = mciSendString(Pcommand, returnData,
+                                      returnData.Capacity, IntPtr.Zero);
+                return int.Parse(returnData.ToString());
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

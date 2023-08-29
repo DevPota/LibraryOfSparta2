@@ -1,7 +1,7 @@
 ﻿namespace LibraryOfSparta.Classes
 {
-    class GameData
+    public class GameData
     {
-        public int CurrentFloor { get; set; } = 0;
+        public int CurrentFloor { get; set; } = 1;
     }
 }
