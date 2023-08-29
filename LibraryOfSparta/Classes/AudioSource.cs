@@ -78,7 +78,7 @@ namespace LibraryOfSparta.Classes
             if (_isloaded)
             {
                 _deviceid = mciGetDeviceID(_alias);
-                _length = GetLength();
+                _length   = GetLength();
             }
             return _isloaded;
         }
@@ -88,8 +88,6 @@ namespace LibraryOfSparta.Classes
             if (_isloaded)
             {
                 string Pcommand = "play " + Alias + " from 0";
-                string asd = "setaudio " + Alias + " volume to " + 1000.ToString();
-                int temp = mciSendString(asd, null, 0, IntPtr.Zero);
                 int ret = mciSendString(Pcommand, null, 0, IntPtr.Zero);
             }
         }
@@ -120,22 +118,24 @@ namespace LibraryOfSparta.Classes
             {
                 return;
             }
-            timer.Interval = Length;
             LoadMediaFile(_medialocation, _alias);
             PlayFromStart();
+            timer.Interval = Length;
         }
 
         public void Pause()
         {
             mciSendString("pause " + Alias, null, 0, IntPtr.Zero);
-            timer.Interval = int.MaxValue;
+            timer.Stop();
             currentPlayed = Length - GetCurentMilisecond();
         }
 
         public void Resume()
         {
             mciSendString("resume " + Alias, null, 0, IntPtr.Zero);
-            timer.Interval = currentPlayed;
+
+            timer.Interval = Length - GetCurentMilisecond();
+            timer.Start();
         }
 
         public void CloseMediaFile()
@@ -159,11 +159,19 @@ namespace LibraryOfSparta.Classes
             isLooping = false;
             timer.Elapsed -= Loop;
             timer.Stop();
+            CloseMediaFile();
+        }
+
+        public void StopTimer()
+        {
+            isLooping = false;
+            timer.Elapsed -= Loop;
+            timer.Stop();
         }
 
         public int GetLength()
         {
-            StringBuilder lengthBuf = new StringBuilder(32);
+            StringBuilder lengthBuf = new StringBuilder(256);
             string PCommand = "status " + Alias + " length";
             mciSendString(PCommand, lengthBuf, lengthBuf.Capacity, IntPtr.Zero);
 
@@ -175,7 +183,7 @@ namespace LibraryOfSparta.Classes
 
         public int GetCurentMilisecond()
         {
-            StringBuilder returnData = new StringBuilder(128);
+            StringBuilder returnData = new StringBuilder(256);
             string Pcommand = "status "+ Alias + " position";
             int error = mciSendString(Pcommand, returnData,
                                   returnData.Capacity, IntPtr.Zero);

@@ -1,6 +1,8 @@
 ﻿using LibraryOfSparta.Classes;
+using LibraryOfSparta.Common;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -27,6 +29,9 @@ namespace LibraryOfSparta.Managers
         AudioSource        BGM      = null;
         Queue<AudioSource> sfxQueue = null;
 
+        string currentBGMPath = "";
+        bool isPaused = false;
+
         public void Init(bool sfxInit = true)
         {
             BGM      = new AudioSource();
@@ -44,8 +49,22 @@ namespace LibraryOfSparta.Managers
 
         public void PlayBGM(string path)
         {
-            BGM.LoadMediaFile(path, BGMAlias);
-            BGM.PlayLoop();
+            if(currentBGMPath == path)
+            {
+                return;
+            }
+            else
+            {
+                currentBGMPath = path;
+                BGM.StopTimer();
+                BGM.LoadMediaFile(currentBGMPath, BGMAlias);
+                BGM.PlayLoop();
+
+                if (isPaused == true)
+                {
+                    BGM.Pause();
+                }
+            }
         }
 
         public void PlaySFX(string path)
@@ -58,18 +77,45 @@ namespace LibraryOfSparta.Managers
 
         public void PauseBGM()
         {
-            BGM.Pause();
+            if(isPaused == true)
+            {
+                return;
+            }
+            else
+            {
+                BGM.Pause();
+                isPaused = true;
+            }
         }
 
         public void ResumeBGM()
         {
-            BGM.Resume();
+            if(isPaused == true)
+            {
+                BGM.Resume();
+                isPaused = false;
+            }
+            else
+            {
+                return;
+            }
         }
     }
 
     class InputModule
     {
+        public ConsoleKeyInfo Ipt { get; set; }
 
+        public async void Init()
+        {
+            Task iptTask = Task.Run(async () =>
+            {
+                while (true)
+                {
+                    Ipt = Console.ReadKey(true);
+                }
+            });
+        }
     }
 
     class DataModule
@@ -107,30 +153,9 @@ namespace LibraryOfSparta.Managers
         }
     }
 
-    class ResourceModule
-    {
-        Dictionary<string, string> ResourceBase = null;
-
-        public void Init()
-        {
-            ResourceBase = new Dictionary<string, string>();
-        }
-
-        public void LoadResource(string name, string element)
-        {
-            ResourceBase.Add(name, element);
-        }
-
-        public string GetResource(string name)
-        {
-            return ResourceBase.GetValueOrDefault(name);
-        }
-    }
-
     public static class Core
     {
         static DataModule     Data     { get; set; } = new DataModule();
-        static ResourceModule Resource { get; set; } = new ResourceModule();
         static SceneModule    Scene    { get; set; } = new SceneModule();
         static SoundModule[]  Sound    { get; set; } = new SoundModule[2];
         static InputModule    Input    { get; set; } = new InputModule();
@@ -138,8 +163,8 @@ namespace LibraryOfSparta.Managers
         public static void Init()
         {
             Data.Init();
-            Resource.Init();
             Scene.Init();
+            Input.Init();
             Sound[0] = new SoundModule();
             Sound[1] = new SoundModule();
             Sound[0].Init();
@@ -184,5 +209,62 @@ namespace LibraryOfSparta.Managers
             Sound[0].PlaySFX(path);
         }
         #endregion
+
+        public static ConsoleKeyInfo GetKey()
+        {
+            return Input.Ipt;
+        }
+
+        public static void ReleaseKey()
+        {
+            Input.Ipt = default;
+        }
+
+        public static void RenderSystemUI()
+        {
+            int x = 0;
+            int y = 0;
+            int endX = Define.SCREEN_X;
+            int endY = Define.SCREEN_Y;
+
+            char lt = '┌';
+            char rt = '┐';
+            char side = '│';
+            char lb = '└';
+            char rb = '┘';
+            string line = "───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────";
+
+            Console.SetCursorPosition(x, y);
+            Console.Write(lt);
+            Console.SetCursorPosition(x+1, y);
+            Console.Write(line);
+            Console.SetCursorPosition(x + endX - 2, y);
+            Console.Write(rt);
+
+            for (int i = 1; i < endY-1; i++)
+            {
+                Console.SetCursorPosition(x, y + i);
+                Console.Write(side);
+                Console.SetCursorPosition(x + endX - 2, y + i);
+                Console.Write(side);
+            }
+
+            Console.SetCursorPosition(x, y + endY-1);
+            Console.Write(lb);
+            Console.SetCursorPosition(x+1, y + endY-1);
+            Console.Write(line);
+            Console.SetCursorPosition(x+ endX -2, y + endY-1);
+            Console.Write(rb);
+        }
+
+        public static string GetData(string path)
+        {
+            return Data.LoadData(path);
+        }
+
+        public static T GetData<T>(string path) where T : new()
+        {
+            return Data.LoadData<T>(path);
+        }
     }
 }
