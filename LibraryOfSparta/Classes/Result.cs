@@ -82,7 +82,7 @@ namespace LibraryOfSparta
 
             r.MakeReward();
             r.GiveReward(3);
-            // r.GiveReward(b.RenderEmotionLevel());    나중엔 이거사용
+            // r.GiveReward(b.RenderEmotionLevel());    나중엔 이거사용 Battle.cs RenderEmotionLevel void -> int, return eELevel
 
             /*
             for (int i = 0; i < 10; i++)
@@ -265,38 +265,6 @@ namespace LibraryOfSparta
 
         }
     }
-    /*
-    public class AddCardClass
-    {
-        public static void AddCardReply()
-        {
-            Console.SetCursorPosition(2, 47);
-            Console.Write("카드를 획득했습니다.");
-        }
-        public static void AddCard()
-        {
-            using(var reward = new StreamReader("CardBase.csv"))
-            {
-                List<Card> CardList = new List<Card>();
-
-                int count = 0;
-
-                Console.SetCursorPosition(5, 2);
-
-                while (!reward.EndOfStream)
-                {
-                    string line = reward.ReadLine();
-                    string[] values = line.Split(',');
-                    CardList.Add(new Card() { NAME = $"{values[0]}", POWER = $"{values[1]}", TYPE = $"{values[2]}", COST = $"{values[3]}", DIALOG = $"{values[4]}" });
-
-                    Console.WriteLine(values);
-                    Console.WriteLine(CardList);
-                    count++;
-                }
-            }
-        }
-    }
-    */
 }
 
 
