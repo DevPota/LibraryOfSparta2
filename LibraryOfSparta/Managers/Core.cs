@@ -9,42 +9,19 @@ using System.Threading.Tasks;
 
 namespace LibraryOfSparta.Managers
 {
-    class SceneModule
-    {
-        public Scene[]                    BuiltInScenes   { get; set; } = null;
-        public Scene                      CurrentScene    { get; set; } = null;
-        public Dictionary<string, Action> EventBase                     = null;
-        public string                     DialogActorName { get; set; }
-        public string                     Dialog          { get; set; }
-
-        public void Init()
-        {
-            EventBase = new Dictionary<string, Action>();
-        }
-    }
-
     class SoundModule
     {
         public string BGMAlias { get; set; }
         AudioSource        BGM      = null;
-        Queue<AudioSource> sfxQueue = null;
 
         string currentBGMPath = "";
         bool isPaused = false;
 
-        public void Init(bool sfxInit = true)
+        int idx = 0;
+
+        public void Init()
         {
             BGM      = new AudioSource();
-
-            if(sfxInit == true)
-            {
-                sfxQueue = new Queue<AudioSource>();
-
-                for (int i = 0; i < 10; i++)
-                {
-                    sfxQueue.Enqueue(new AudioSource());
-                }
-            }
         }
 
         public void PlayBGM(string path)
@@ -56,23 +33,19 @@ namespace LibraryOfSparta.Managers
             else
             {
                 currentBGMPath = path;
-                BGM.StopTimer();
-                BGM.LoadMediaFile(currentBGMPath, BGMAlias);
-                BGM.PlayLoop();
+                BGM.ForceStopAll();
 
-                if (isPaused == true)
-                {
-                    BGM.Pause();
-                }
+                BGM = new AudioSource();
+                BGM.LoadMediaFile(path, BGMAlias + idx++);
+                BGM.PlayLoop();
             }
         }
 
         public void PlaySFX(string path)
         {
-            AudioSource temp = sfxQueue.Dequeue();
-            temp.LoadMediaFile(path, "sfx_" + sfxQueue.Count);
+            AudioSource temp = new AudioSource();
+            temp.LoadMediaFile(path, "SFX_" + idx++);
             temp.PlayFromStart();
-            sfxQueue.Enqueue(temp);
         }
 
         public void PauseBGM()
@@ -155,22 +128,28 @@ namespace LibraryOfSparta.Managers
 
     public static class Core
     {
-        static DataModule     Data     { get; set; } = new DataModule();
-        static SceneModule    Scene    { get; set; } = new SceneModule();
-        static SoundModule[]  Sound    { get; set; } = new SoundModule[2];
-        static InputModule    Input    { get; set; } = new InputModule();
+        public static GameData SaveData { get; private set;}  = null;
+
+        public static int SceneIndex     { get; private set; } = 0;
+        public static Scene CurrentScene { get; private set; } = null;
+
+        static DataModule     Data      { get; set; }         = new DataModule();
+        static SoundModule[]  Sound     { get; set; }         = new SoundModule[2];
+        static InputModule    Input     { get; set; }         = new InputModule();
 
         public static void Init()
         {
             Data.Init();
-            Scene.Init();
             Input.Init();
             Sound[0] = new SoundModule();
             Sound[1] = new SoundModule();
             Sound[0].Init();
-            Sound[1].Init(false);
+            Sound[1].Init();
             Sound[0].BGMAlias = "PlayerBGM";
             Sound[1].BGMAlias = "EnemyBGM";
+
+            SaveData = Data.LoadData<GameData>(Define.SAVE_PATH);
+            Save();
         }
 
         #region Sound
@@ -265,6 +244,52 @@ namespace LibraryOfSparta.Managers
         public static T GetData<T>(string path) where T : new()
         {
             return Data.LoadData<T>(path);
+        }
+
+        public static void LoadScene(int sceneIndex)
+        {
+            Console.Clear();
+
+            SceneIndex = sceneIndex;
+
+            switch (SceneIndex)
+            {
+                case 0:
+                    CurrentScene = new TitleMenu();
+                    ((TitleMenu)CurrentScene).Init();
+                    break;
+                case 1:
+                    CurrentScene = new Entrance();
+                    ((Entrance)CurrentScene).Init();
+                    break;
+                case 2:
+                    CurrentScene = new DeckSetting();
+                    ((DeckSetting)CurrentScene).Init();
+                    break;
+                case 3:
+                    Scene temp = new Battle();
+                    ((Battle)temp).Initbattle(((Entrance)CurrentScene).CursorIndex);
+                    CurrentScene = temp;
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+
+            }
+        }
+
+        public static void Save()
+        {
+            Data.SaveData(Define.SAVE_PATH, SaveData);
+        }
+
+        public static void ReleaseScene()
+        {
+            SceneIndex = -1;
+            CurrentScene = null;
         }
     }
 }

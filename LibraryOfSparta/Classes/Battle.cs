@@ -1,508 +1,226 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Threading.Tasks;
-using LibraryOfSparta.Common;
+﻿using LibraryOfSparta.Common;
+using System.Timers;
+using System.Threading;
+using System.Runtime.InteropServices;
+using LibraryOfSparta.Managers;
 
 namespace LibraryOfSparta.Classes
 {
-    public enum BattleSitulation
+    public class Battle : Scene
     {
-        NONE,
-        ATK,
-        BUFF,
-        VICTORY,
-        DEFEAT
-    }
+        Player   player { get; set; } = null;
+        Enemy    enemy { get; set; } = null;
+        BattleUI battleUI { get; set; } = null;
 
-    public class Battle
-    {
-        public void Init()
+        string[] floorData = null;
+
+        int playerEmotion = 0;
+        int enemyEmotion = 0;
+        int playerToken = 0;
+        int enemyToken = 0;
+        int playerCost = 0;
+        int playerCostFilled = 0;
+        int playerHands = 0;
+        int playerDrawFilled = 0;
+        int enemyFilled = 0;
+
+        bool isPlayerWinning = true;
+
+        public void Initbattle(int battleIndex)
         {
-            Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
+            playerEmotion = 0;
+            enemyEmotion = 0;
+            playerToken = 0;
+            enemyToken = 0;
 
-            char lt = '┌';
-            char tb = '─';
-            char rt = '┐';
-            char lr = '│';
-            char lb = '└';
-            char rb = '┘';
+            playerCost = 0;
+            playerCostFilled = 0;
 
-            // Enemy
-            int leftTopX = 1;
-            int leftTopY = 1;
-            int leftTopEndX = 80;
-            int leftTopEndY = 30;
+            playerHands = 0;
+            playerDrawFilled = 0;
 
-            // enemy Border
-            Console.SetCursorPosition(leftTopX, leftTopY);
+            string battleUIData = Core.GetData(Define.BATTLE_DATA_PATH);
+            string[] lines = battleUIData.Split('\n');
 
-            Console.Write(lt);
-            for (int i = 1; i < leftTopEndX - 1; i++)
-            {
-                Console.Write(tb);
-            }
-            Console.Write(rt);
+            floorData = lines[battleIndex+1].Split(',');
 
-            // enemy border left right
-            for (int i = leftTopY + 1; i < leftTopEndY - 1; i++)
-            {
-                Console.SetCursorPosition(leftTopX, i);
-                Console.Write(lr);
-                Console.SetCursorPosition(leftTopEndX, i);
-                Console.Write(lr);
-            }
+            battleUI = new BattleUI();
+            battleUI.Init();
 
-            // enemy border bottom
-            Console.SetCursorPosition(leftTopX, leftTopEndY - 1);
+            enemy  = new Enemy(int.Parse(floorData[4]), int.Parse(floorData[4]), floorData[3]);
+            player = new Player(battleUI.RenderPlayerHPBar);
 
-            Console.Write(lb);
-            for (int i = 1; i < leftTopEndX - 1; i++)
-            {
-                Console.Write(tb);
-            }
-            Console.Write(rb);
+            // Draw enemy
+            battleUI.RenderEnemyName(floorData[0], floorData[1]);
+            battleUI.RenderEnemyHPBar(enemy.Hp, enemy.MaxHp);
+            battleUI.RenderEnemyATBBar();
+            battleUI.DrawEnemy(Define.IMAGE_PATH + "/Img_" + floorData[2] + ".txt");
+
+            // Draw Card Queue
+            battleUI.RenderCardQueue();
+            battleUI.UpdateCardQueue();
+
+            // battleUI status
+            battleUI.RenderPlayerHPBar(player.Hp, player.MaxHp);
+            battleUI.RenderPlayerStatus(player);
+            battleUI.RenderPlayerBuffStatus();
+            UpdateEmotion();
+
+            enemy.SetPattern();
+            battleUI.RenderBattleDialog("장윤서 매니저", "TIL 작성 하셔야죠?");
         }
 
-        public void RenderEnemyName(string location = "총류의 층 9F", string enemyName = "박종민 매니저")
+        public void UpdateEmotion()
         {
-            int pivotX = 34;
-            int pivotY = 2;
+            int[] rules = { 0, 0, 1, 1, 1, 2 };
 
-            Console.SetCursorPosition(3, pivotY);
-            Console.Write(location);
-            Console.SetCursorPosition(pivotX, pivotY);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write(enemyName);
-            Console.ResetColor();
-            Console.SetCursorPosition(2, pivotY + 1);
-            string line = "──────────────────────────────────────────────────────────────────────────────";
+            battleUI.RenderEmotionLevel(playerEmotion, enemyEmotion, playerToken, enemyToken);
 
-            Console.Write(line);
-        }
+            Core.PlayPlayerBGM(Define.BGM_PATH + "/" + floorData[2] + "_" + rules[playerEmotion] + ".wav");
+            Core.PlayEnemyBGM(Define.BGM_PATH + "/" + "Enemy_" + rules[enemyEmotion] + ".wav");
 
-        public void RenderEnemyHPBar(int enemyHP = 1000, int enemyMaxHP = 1000)
-        {
-            int pivotX    = 3;
-            int pivotY    = 4;
-            int pivotMaxX = 50;
-            char side     = '|';
-            char bar      = '█';
-
-            Console.SetCursorPosition(pivotX, pivotY);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("체력 : {0}/{1}", enemyHP, enemyMaxHP);
-
-            int percentage  = (int)(pivotMaxX * ((double)enemyHP / enemyMaxHP));
-
-            Console.SetCursorPosition(pivotX, pivotY + 1);
-            Console.ResetColor();
-            Console.Write(side);
-            for (int i = 0; i < percentage; i++)
+            if (playerEmotion >= enemyEmotion)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.SetCursorPosition(i + 4, pivotY + 1);
-                Console.Write(bar);
-            }
-
-            for (int i = percentage; i < pivotMaxX; i++)
-            {
-                Console.SetCursorPosition(i+4, pivotY + 1);
-                Console.Write(' ');
-            }
-            Console.SetCursorPosition(pivotMaxX+4, pivotY + 1);
-            Console.ResetColor();
-            Console.Write(side);
-        }
-
-        public void RenderEnemyATBBar(string enemySkillName = "안녕하세요?", int enemyATB = 30, int enemyMaxATB = 50)
-        {
-            int pivotX = 3;
-            int pivotY = 6;
-            int pivotMaxX = 50;
-            char side = '|';
-            char bar = '█';
-
-            Console.SetCursorPosition(pivotX, pivotY);
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write(enemySkillName);
-            Console.ResetColor();
-
-            Console.SetCursorPosition(pivotX, pivotY + 1);
-            Console.Write(side);
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-            pivotX++;
-
-            for (int i = 0; i < enemyATB; i++)
-            {
-                Console.SetCursorPosition(pivotX + i, pivotY + 1);
-                Console.Write(bar);
-            }
-            Console.ResetColor();
-            for (int i = enemyATB; i < pivotMaxX; i++)
-            {
-                Console.SetCursorPosition(pivotX + i, pivotY + 1);
-                Console.Write(' ');
-            }
-            Console.ResetColor();
-            Console.Write(side);
-        }
-
-        public void DrawEnemy(string path)
-        {
-            int x = 3;
-            int y = 8;
-            int endY = 29;
-
-            string img = File.ReadAllText(path);
-
-            string[] lines = img.Split('\n');
-
-            Console.SetCursorPosition(x, y);
-
-            for (int i = 0; i < endY - y; i++)
-            {
-                Console.SetCursorPosition(x, y + i);
-                Console.Write(lines[i]);
-            }
-        }
-
-        public void RenderCardQueue()
-        {
-            int x    = 82;
-            int y    = 3;
-            int endX = 128;
-            int endY = 20;
-
-            for (int i = y; i < endY; i++)
-            {
-                Console.SetCursorPosition(x, i);
-                Console.Write('|');
-
-                Console.SetCursorPosition(x + 20, i);
-                Console.Write('|');
-            }
-        }
-
-        public void UpdateCardQueue()
-        {
-            int x = 82;
-            int endY = 20;
-
-            // Card Queue Indexing
-            List<string> hands = new List<string>();
-            hands.Add("1 코스트\n가벼운 공격");
-            hands.Add("2 코스트\n집중 공격");
-            hands.Add("1 코스트\n가벼운 공격");
-            hands.Add("1 코스트\n회피");
-
-            int handStart = endY - 1;
-
-            string cardFrame = new string('─', 16);
-
-            for (int i = 0; i < hands.Count; i++)
-            {
-                string[] temp = hands[i].Split('\n');
-
-                Console.SetCursorPosition(x + 2, handStart);
-                Console.Write(cardFrame);
-                Console.SetCursorPosition(x + 2, handStart - 1);
-                Console.Write(temp[1]);
-                Console.SetCursorPosition(x + 2, handStart - 2);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(temp[0]);
-                Console.ResetColor();
-                Console.SetCursorPosition(x + 2, handStart - 3);
-                Console.Write(cardFrame);
-                Console.SetCursorPosition(x + 22, handStart - 1);
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("[{0}]", 1 + i);
-                Console.ResetColor();
-
-                handStart -= 4;
-            }
-        }
-
-        public void RenderPlayerCostATBBar(int playerCost = 1, int playerCostFill = 20)
-        {
-            int x = 84;
-            int y = 19;
-            int barLength = 31;
-
-            char side = '|';
-            char bar  = '█';
-
-            Console.SetCursorPosition(x, y + 1);
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("보유 코스트 : {0}/{1}", playerCost, 10);
-
-            Console.SetCursorPosition(x, y + 3);
-            Console.Write(" ≫ 코스트");
-            Console.SetCursorPosition(x, y + 4);
-            Console.ResetColor();
-            Console.Write(side);
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-            for (int i = 1; i < playerCostFill; i++)
-            {
-                Console.SetCursorPosition((x+1) + i, y + 4);
-                Console.Write(bar);
-
-            }
-            Console.ResetColor();
-            for (int i = playerCostFill; i < barLength; i++)
-            {
-                Console.SetCursorPosition((x+1) + i, y + 4);
-                Console.Write(' ');
-
-            }
-            Console.Write(side);
-        }
-
-        public void RenderPlayerDrawATBBar(int atbDrawFill = 7)
-        {
-            int x = 84;
-            int y = 24;
-            int barLength = 31;
-
-            char side = '|';
-            char bar  = '█';
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-
-            Console.SetCursorPosition(x, y);
-            Console.Write(" 心 카드 드로우");
-            Console.SetCursorPosition(x, y+1);
-            Console.ResetColor();
-            Console.Write(side);
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            
-            for (int i = 1; i < atbDrawFill; i++)
-            {
-                Console.SetCursorPosition((x+1) + i, y + 1);
-                Console.Write(bar);
-
-            }
-            Console.ResetColor();
-            for (int i = atbDrawFill; i < barLength; i++)
-            {
-                Console.SetCursorPosition((x+1) + i, y + 1);
-                Console.Write(' ');
-
-            }
-            Console.Write(side);
-        }
-
-        public void RenderPlayerHPBar(int playerHP = 48, int playerMaxHP = 100)
-        {
-            // Draw HPBar
-            int x = 3;
-            int y = 33;
-            int barLength = 51;
-            int barFiled  = (int)(barLength * ((double) playerHP / playerMaxHP));
-
-            char side = '|';
-            char bar  = '█';
-
-            Console.SetCursorPosition(x, y);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("체력");
-            Console.ResetColor();
-
-            Console.SetCursorPosition(x + 4, y);
-            Console.Write(side);
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            for (int i = 1; i < barFiled+1; i++)
-            {
-                Console.SetCursorPosition((x + 4) + i, y);
-                Console.Write(bar);
-            }
-            Console.ResetColor();
-            for (int i = barFiled; i < barLength; i++)
-            {
-                Console.SetCursorPosition((x + 4) + i, y);
-                Console.Write(' ');
-            }
-            Console.Write(side);
-
-            Console.SetCursorPosition(x + barLength+6, y);
-            Console.Write("{0}/{1}", playerHP, playerMaxHP);
-        }
-
-        public void RenderBattleDialog(string caster = "당신", string target = "박종민 매니저", string skillName = "가벼운 공격", int power = 10, BattleSitulation situlation = BattleSitulation.NONE)
-        {
-            int x = 3;
-            int y = 30;
-
-            
-            Console.SetCursorPosition(x, y);
-            
-
-            switch (situlation)
-            {
-                case BattleSitulation.NONE:
-                    Console.Write("{0}", caster);
-                    Console.SetCursorPosition(x, y + 1);
-                    Console.Write("{0}", target);
-                    break;
-                case BattleSitulation.ATK:
-                    Console.Write("{0}의 {1}!", caster, skillName);
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.SetCursorPosition(x, y + 1);
-                    Console.Write("{0}는 {1} 대미지를 받았다!", target, power);
-                    break;
-                case BattleSitulation.BUFF:
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.Write("{0}의 {1}!", caster, skillName);
-                    break;
-                default:
-                    break;
-            }
-
-            
-        }
-
-        public void RenderPlayerStatus(Player player)
-        {
-            /* temp */
-            player = new Player();
-            int x = 4;
-            int y = 36;
-
-            int emotionLevel = 1;
-            int atkbuffs = 0;
-            int defBuffs = 5;
-            int spdBuffs = 0;
-            int focusBuffs = 0;
-
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.SetCursorPosition(x, y);
-            Console.Write("❤ 스테이터스");
-            Console.ResetColor();
-            Console.SetCursorPosition(x, y + 2);
-            Console.Write("✊ 힘   : {0} + {1} ({2})", player.Str, emotionLevel + atkbuffs, player.Str + emotionLevel + atkbuffs);
-            Console.SetCursorPosition(x, y + 3);
-            Console.Write("⛨ 방어 : {0} + {1} ({2})", player.Def, emotionLevel + defBuffs, player.Def + emotionLevel + defBuffs);
-            Console.SetCursorPosition(x, y + 4);
-            Console.Write("≫ 속도 : {0} + {1} ({2})", player.Spd, emotionLevel + spdBuffs, player.Spd + emotionLevel + spdBuffs);
-            Console.SetCursorPosition(x, y + 5);
-            Console.Write("心 집중 : {0} + {1} ({2})", player.Fcs, emotionLevel + focusBuffs, player.Fcs + emotionLevel + focusBuffs);
-        }
-
-        public void RenderPlayerBuffStatus()
-        {
-            int buffX = 34;
-            int buffY = 36;
-
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.SetCursorPosition(buffX, buffY);
-            Console.Write("버프");
-            List<string> buffList = new List<string>();
-            buffList.Add("회피");
-            buffList.Add("가벼운 방어");
-
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            for (int i = 0; i < buffList.Count; i++)
-            {
-                Console.SetCursorPosition(buffX, (buffY + 2) + i);
-                Console.Write(buffList[i]);
-            }
-            Console.ResetColor();
-
-            int debuffX = 50;
-            int debuffY = buffY;
-            List<string> debuffList = new List<string>();
-            debuffList.Add("과제 2배");
-            debuffList.Add("과제 4배");
-            debuffList.Add("과제 2배");
-            debuffList.Add("과제 2배");
-            debuffList.Add("마비");
-            debuffList.Add("과제 2배");
-
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.SetCursorPosition(debuffX, debuffY);
-            Console.Write("디버프");
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            for (int i = 0; i < debuffList.Count; i++)
-            {
-                Console.SetCursorPosition(debuffX, (debuffY + 2) + i);
-                Console.Write(debuffList[i]);
-            }
-            Console.ResetColor();
-        }
-
-        public void RenderEmotionLevel(int pELevel = 1, int eELevel = 2, int pToken = 4, int eToken = 1)
-        {
-            int x = 82;
-            int y = 31;
-            int barLength = 5;
-
-            string token = "██████ ";
-            string empty = "       ";
-
-            Console.SetCursorPosition(x + 8, y);
-
-            if(pELevel >= eELevel)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("⚔ 당신이 유리한 상황 ⚔");
+                if (isPlayerWinning == false)
+                {
+                    isPlayerWinning = true;
+                    Core.PlaySFX(Define.SFX_PATH + "/FingerTip.wav");
+                }
+                Core.PauseEnemyBGM();
+                Core.ResumePlayerBGM();
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("⚔ 상대가 유리한 상황 ⚔");
+                if (isPlayerWinning == true)
+                {
+                    isPlayerWinning = false;
+                    Core.PlaySFX(Define.SFX_PATH + "/FingerTip.wav");
+                }
+
+                Core.PausePlayerBGM();
+                Core.ResumeEnemyBGM();
             }
-            Console.ResetColor();
+        }
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.SetCursorPosition(x, y + 2);
-            Console.Write("당신의 감정 레벨 : {0}", pELevel);
-            
-            Console.ResetColor();
-
-            Console.SetCursorPosition(x, y + 4);
-            Console.Write('|');
-            Console.ForegroundColor = ConsoleColor.Green;
-            for (int i = 0; i < pToken; i++)
+        public void UpdatePlayerCost()
+        {
+            if (playerCost >= 10)
             {
-                Console.SetCursorPosition((x+1) + (i * token.Length), y + 4);
-                Console.Write(token);
+                return;
             }
-            Console.ResetColor();
-            for(int i = pToken; i < barLength; i++)
+
+            playerCostFilled += player.Spd / 5;
+
+            if (playerCostFilled >= 31)
             {
-                Console.SetCursorPosition((x+1) + (i * token.Length), y + 4);
-                Console.Write(empty);
+                playerCostFilled = 0;
+                playerCost++;
+
+                if (playerCost >= 10)
+                {
+                    playerCost = 10;
+                }
             }
-            Console.Write('|');
 
-            // ----------------------------------------------
+            battleUI.RenderPlayerCostATBBar(playerCost, playerCostFilled);
+        }
 
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.SetCursorPosition(x, y + 6);
-            Console.Write("상대의 감정 레벨 : {0}", eELevel);
-            Console.ResetColor();
+        public void UpdatePlayerDraw()
+        {
+            playerDrawFilled += player.Fcs / 15;
 
-            Console.SetCursorPosition(x, y + 8);
-            Console.Write('|');
-            Console.ForegroundColor = ConsoleColor.Red;
-            for (int i = 0; i < eToken; i++)
+            if (playerDrawFilled >= 31)
             {
-                Console.SetCursorPosition((x+1) + (i * token.Length), y + 8);
-                Console.Write(token);
-            }
-            Console.ResetColor();
-            for (int i = eToken; i < barLength; i++)
-            {
-                Console.SetCursorPosition((x+1) + (i * token.Length), y + 8);
-                Console.Write(empty);
-            }
-            Console.Write('|');
+                playerDrawFilled = 0;
 
-            Console.SetCursorPosition(x, y + 12);
-            Console.Write("A. 입구로 돌아가기");
+
+                if (playerHands >= 4)
+                {
+
+                }
+            }
+
+            battleUI.RenderPlayerDrawATBBar(playerDrawFilled);
+        }
+
+        public void UpdateEnemyATB()
+        {
+            enemyFilled += 1;
+
+            if (enemyFilled >= enemy.Spd)
+            {
+                enemyFilled = 0;
+
+                enemy.CastPattern(player);
+                enemy.SetPattern();
+            }
+
+            battleUI.RenderEnemyATBBar(enemy.CurrentSkill.Name, enemyFilled, enemy.Spd);
+        }
+
+        public void PlayerInput()
+        {
+            ConsoleKeyInfo key = Core.GetKey();
+
+
+
+
+            //if (key.Key == ConsoleKey.A)
+            //{
+            //    Test(true);
+            //}
+            //else if (key.Key == ConsoleKey.D)
+            //{
+            //    Test(false);
+            //}
+
+            Core.ReleaseKey();
+        }
+
+        public void Test(bool asd)
+        {
+            if (asd == true)
+            {
+                if (playerEmotion == 5)
+                {
+                    UpdateEmotion();
+                    return;
+                }
+
+                playerToken++;
+
+                if (playerToken == 5)
+                {
+                    playerToken = 0;
+                    playerEmotion++;
+                }
+            }
+            else
+            {
+                if (enemyEmotion == 5)
+                {
+                    UpdateEmotion();
+                    return;
+                }
+
+                enemyToken++;
+
+                if (enemyToken == 5)
+                {
+                    enemyToken = 0;
+                    enemyEmotion++;
+                }
+            }
+
+            UpdateEmotion();
+        }
+
+        public void Update()
+        {
+            UpdatePlayerCost();
+            UpdatePlayerDraw();
+            //UpdateEnemyATB();
+            PlayerInput();
         }
     }
 }

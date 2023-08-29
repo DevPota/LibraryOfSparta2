@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
+using LibraryOfSparta;
 using LibraryOfSparta.Classes;
 using LibraryOfSparta.Common;
 using LibraryOfSparta.Managers;
@@ -8,8 +9,6 @@ using LibraryOfSparta.Managers;
 class Program
 {
     static bool applicationQuit = false;
-
-    static DeckSetting temp = new DeckSetting();
 
     static void Main()
     {
@@ -25,12 +24,12 @@ class Program
 
         Core.Init();
         Core.RenderSystemUI();
-        temp.Init();
-        //GameManager.InitBattle(1);
     }
 
     static void Start()
     {
+        Core.LoadScene(0);
+
         while (applicationQuit == false)
         {
             Update();
@@ -41,9 +40,27 @@ class Program
 
     static void Update()
     {
-        temp.Update();
-        //GameManager.Update();
+        switch(Core.SceneIndex)
+        {
+            case 0:
+                ((TitleMenu)Core.CurrentScene).Update();
+                break;
+            case 1:
+                ((Entrance)Core.CurrentScene).Update();
+                break;
+            case 2:
+                ((DeckSetting)Core.CurrentScene).Update();
+                break;
+            case 3:
+                ((Battle)Core.CurrentScene).Update();
+                break;
+        }
 
         Core.ReleaseKey();
+    }
+
+    public static void Exit()
+    {
+        applicationQuit = true;
     }
 }

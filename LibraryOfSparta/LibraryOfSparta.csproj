@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Images\" />
-    <Folder Include="Data\" />
     <Folder Include="Sounds\BGM\" />
     <Folder Include="Sounds\SFX\" />
   </ItemGroup>

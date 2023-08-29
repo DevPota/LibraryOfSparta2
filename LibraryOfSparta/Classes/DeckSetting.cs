@@ -5,10 +5,10 @@ using System;
 using LibraryOfSparta.Common;
 using Microsoft.VisualBasic;
 using LibraryOfSparta.Managers;
+using LibraryOfSparta.Classes;
 
-public class DeckSetting
+public class DeckSetting : Scene
 {
-
     List<Card> myCrad = new List<Card>();
     List<Card> myDeck = new List<Card>();
 
@@ -24,8 +24,6 @@ public class DeckSetting
         //Core.PlayPlayerBGM(Define.BGM_PATH + "/Entrance.wav");
 
         TestCard();
-
-        Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
         MainPanel();
         InventoryPanel();
 
@@ -44,7 +42,7 @@ public class DeckSetting
     {
 
         Console.SetCursorPosition(1, 1);
-        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.ForegroundColor = ConsoleColor.Yellow;
         {
             Console.Write("┌");
             for (int i = 0; i < Define.SCREEN_X - 5; i++)
@@ -185,7 +183,7 @@ public class DeckSetting
             Console.SetCursorPosition(12, Define.SCREEN_Y - 22);
             Console.Write("◀[A]              {0}페이지               [D]▶   ", page);
         }//방향표 페이지
-    }
+    }// 메인 창 그리기
 
     void DescriptionPanel()
     {
@@ -261,7 +259,7 @@ public class DeckSetting
         {
 
         }// 카드 정보
-    }
+    }// 카드 정보 창 그리기
 
     void MyCardDraw()
     {
@@ -305,124 +303,9 @@ public class DeckSetting
         Console.ResetColor();
     }// 커서 그리기
 
-    void InputCheck()
-    {
-        ConsoleKeyInfo key = Core.GetKey();
-
-        if (key.Key == ConsoleKey.A)
-        {
-            if (page > 1)
-            {
-                page -= 1;
-                InventoryPanel();
-            }
-        }//전 페이지
-        else if (key.Key == ConsoleKey.D)
-        {
-            if ((page * 10) < myCrad.Count)
-            {
-                page += 1;
-                InventoryPanel();
-            }
-        }//다음 페이지
-        else if (key.Key == ConsoleKey.W)
-        {
-            Console.SetCursorPosition(10, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            Console.SetCursorPosition(70, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            Console.SetCursorPosition(58, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            Console.SetCursorPosition(118, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            if (cursor > 0)
-            {
-
-                cursor -= 1;
-            }
-            else
-            {
-                cursor = 9;
-            }
-
-        }//커서 위로
-        else if (key.Key == ConsoleKey.S)
-        {
-            Console.SetCursorPosition(10, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            Console.SetCursorPosition(70, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            Console.SetCursorPosition(58, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            Console.SetCursorPosition(118, (cursor * 2) + 8);
-            Console.WriteLine("  ");
-            if (cursor < 9)
-            {
-                cursor += 1;
-            }
-            else
-            {
-                cursor = 0;
-            }
-                }//커서 아래로
-        else if (key.Key == ConsoleKey.Tab)
-        {
-            if(cursor_is_mycard == true)
-            {
-                Console.SetCursorPosition(10, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                Console.SetCursorPosition(70, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                Console.SetCursorPosition(58, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                Console.SetCursorPosition(118, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                cursor_is_mycard = false;
-                Core.PlaySFX(Define.SFX_PATH + "/BookSound_0.wav");
-            }
-            else
-            {
-                Console.SetCursorPosition(10, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                Console.SetCursorPosition(70, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                Console.SetCursorPosition(58, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                Console.SetCursorPosition(118, (cursor * 2) + 8);
-                Console.WriteLine("  ");
-                cursor_is_mycard = true;
-                Core.PlaySFX(Define.SFX_PATH + "/BookSound_1.wav");
-            }
-
-        }
-        else if (key.Key == ConsoleKey.Enter)
-        {
-            MyDeckAdd();
-        }// 장착
-        else if (key.Key == ConsoleKey.Backspace)
-        {
-            CardRemove();
-
-        }// 삭제
-
-        if (key == default)
-        {
-            return;
-        }
-        else
-        {
-            DescriptionPanel();
-            MyCardDraw();
-            MyDeckDraw();
-            CursorDraw();
-
-            
-        }
-
-    }// 버튼 체크
-
     void CardRemove()
     {
+        InventoryPanel();
         try
         {
             if (cursor_is_mycard)
@@ -443,29 +326,41 @@ public class DeckSetting
             }
             else
             {
-                Card card = new Card();
-                card = myDeck[cursor];
-                myDeck.Remove(card);
+
+                myCrad.Add(myDeck[cursor]);
+                myDeck.Remove(myDeck[cursor]);
                 Console.SetCursorPosition(73, 8 + myDeck.Count * 2);
                 Console.WriteLine("                                               ");
             }
+            Core.PlaySFX(Define.SFX_PATH + "/Card_Cancel.wav");
         }
         catch
         {
-
+            Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
         }
 
     }// 카드 삭제
 
     void MyDeckAdd()
     {
-        Card card = new Card();
-        card = myCrad[(page - 1) * 10 + cursor];
-        if (myDeck.Count < 10 && cursor_is_mycard)
+        if ((page - 1) * 10 + cursor < myCrad.Count)
         {
-            myDeck.Add(card);
+            if (myDeck.Count < 10 && cursor_is_mycard)
+            {
+                Core.PlaySFX(Define.SFX_PATH + "/Card_Apply.wav");
+                myDeck.Add(myCrad[(page - 1) * 10 + cursor]);
+                CardRemove();
+            }
+            else
+            {
+                Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
+            }
         }
-    }// 덱 완
+        else
+        {
+            Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
+        }
+    }// 카드 이동
       
     void Input()
     {
@@ -473,6 +368,125 @@ public class DeckSetting
 
         InputCheck();
     }// 입력 
+
+    void InputCheck()
+    {
+        ConsoleKeyInfo key = Core.GetKey();
+        
+        switch(key.Key)
+        {
+            case ConsoleKey.A :
+            case ConsoleKey.LeftArrow :
+                Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
+                if (page > 1)
+                {
+                    page -= 1;
+                    InventoryPanel();
+                }
+                break;
+            case ConsoleKey.D :
+            case ConsoleKey.RightArrow :
+                Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
+                if ((page * 10) < myCrad.Count)
+                {
+                    page += 1;
+                    InventoryPanel();
+                }
+                break;
+            case ConsoleKey.W :
+            case ConsoleKey.UpArrow :
+                Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
+                Console.SetCursorPosition(10, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(70, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(58, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(118, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                if (cursor > 0)
+                {
+
+                    cursor -= 1;
+                }
+                else
+                {
+                    cursor = 9;
+                }
+                break;
+            case ConsoleKey.S :
+            case ConsoleKey.DownArrow :
+                Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
+                Console.SetCursorPosition(10, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(70, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(58, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(118, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                if (cursor < 9)
+                {
+                    cursor += 1;
+                }
+                else
+                {
+                    cursor = 0;
+                }
+                break;
+            case ConsoleKey.Tab :
+                Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
+
+                if (cursor_is_mycard == true)
+                {
+
+                    cursor_is_mycard = false;
+                }
+                else
+                {
+                    cursor_is_mycard = true;
+                }
+                Console.SetCursorPosition(10, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(70, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(58, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                Console.SetCursorPosition(118, (cursor * 2) + 8);
+                Console.WriteLine("  ");
+                break;
+            case ConsoleKey.Enter :
+            case ConsoleKey.Spacebar :
+                if (cursor_is_mycard)
+                {
+                    MyDeckAdd();
+                }
+                else
+                {
+                    CardRemove();
+                }
+                break;
+            case ConsoleKey.Backspace :
+                CardRemove();
+                break;
+            case ConsoleKey.Escape :
+                Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
+                Core.LoadScene(1);
+                return;
+        }
+
+        if (key == default)
+        {
+            return;
+        }
+        else
+        {
+            DescriptionPanel();
+            MyCardDraw();
+            MyDeckDraw();
+            CursorDraw();
+        }
+    }
 
     void TestCard()
     {
@@ -488,15 +502,6 @@ public class DeckSetting
         myCrad.Add(new Card("집중 공격", 18, (CardType)0, 2, "적에게 18 대미지를 준다"));
         myCrad.Add(new Card("무거운 공격", 20, (CardType)0, 1, "적에게 20 대미지를 준다"));
 
-        myDeck.Add(new Card("가벼운 공격", 1, (CardType)0, 1, "적에게 10 대미지를 준다"));
-        myDeck.Add(new Card("회피", 2, (CardType)1, 1, "8 이하의 다음 공격은 무조건 회피한다"));
-        myDeck.Add(new Card("가벼운 방어", 3, (CardType)2, 1, "다음 받는 대미지를 5 경감 시킨다"));
-        myDeck.Add(new Card("공격과 수비", 4, (CardType)3, 2, "적에게 12 대미지를 주고 다음 받는 대미지를 6 경감시킨다"));
-        myDeck.Add(new Card("집중 공격", 5, (CardType)0, 2, "적에게 18 대미지를 준다"));
-        myDeck.Add(new Card("가벼운 공격", 6, (CardType)0, 1, "적에게 10 대미지를 준다"));
-        myDeck.Add(new Card("회피", 7, (CardType)1, 1, "8 이하의 다음 공격은 무조건 회피한다"));
-        myDeck.Add(new Card("가벼운 방어", 8, (CardType)2, 1, "다음 받는 대미지를 5 경감 시킨다"));
-        myDeck.Add(new Card("공격과 수비", 9, (CardType)3, 2, "적에게 12 대미지를 주고 다음 받는 대미지를 6 경감시킨다"));
 
     }// 테스트 카드 세팅
 }
