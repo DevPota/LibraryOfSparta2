@@ -28,7 +28,7 @@ class Program
 
     static void Start()
     {
-        Core.LoadScene(0);
+        Core.LoadScene(4);
 
         while (applicationQuit == false)
         {
@@ -53,6 +53,9 @@ class Program
                 break;
             case 3:
                 ((Battle)Core.CurrentScene).Update();
+                break;
+            case 4:
+                ((Result)Core.CurrentScene).Update();
                 break;
         }
 
