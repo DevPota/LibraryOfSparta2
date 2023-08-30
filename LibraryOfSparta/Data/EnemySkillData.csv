@@ -1,4 +1,4 @@
-NAME,POWER,TYPE,BUFF,SPEED,SFX
-TIL,0,0,0,50,
-작성하셨나요?,5,0,,100,
-여러분 잘들리시나요?,20,0,,200,
+NAME,POWER,TYPE,BUFF,SPEED,SFX_BEFORE,SFX_AFTER
+TIL,0,0,0,50,,
+작성하셨나요?,5,0,,100,,
+여러분 잘들리시나요?,20,0,,200,,

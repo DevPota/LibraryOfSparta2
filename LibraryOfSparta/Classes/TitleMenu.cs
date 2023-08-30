@@ -82,12 +82,14 @@ namespace LibraryOfSparta.Classes
 
             switch (key.Key)
             {
+                case ConsoleKey.W:
                 case ConsoleKey.UpArrow:
                     Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
                     if (Icursor > 0) Bcursor.Draw(cursorAbleLogo[--Icursor]);
                     else Icursor = cursorAbleLogo.Count - 1; Bcursor.Draw(cursorAbleLogo[Icursor]);
                     break;
 
+                case ConsoleKey.S:
                 case ConsoleKey.DownArrow:
                     Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
                     if (Icursor < cursorAbleLogo.Count - 1) Bcursor.Draw(cursorAbleLogo[++Icursor]);

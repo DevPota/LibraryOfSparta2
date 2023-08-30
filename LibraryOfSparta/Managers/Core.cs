@@ -272,6 +272,8 @@ namespace LibraryOfSparta.Managers
                     CurrentScene = temp;
                     break;
                 case 4:
+                    CurrentScene = new Result();
+                    ((Result)CurrentScene).Init();
                     break;
                 case 5:
                     break;

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using LibraryOfSparta.Common;
+using LibraryOfSparta.Managers;
 
 namespace LibraryOfSparta.Classes
 {
@@ -16,9 +17,11 @@ namespace LibraryOfSparta.Classes
 
     public class BattleUI
     {
+        string[] cardDataLines;
+
         public void Init()
         {
-            Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
+            cardDataLines = Core.GetData(Define.CARD_DATA_PATH).Split('\n');
 
             char lt = '┌';
             char tb = '─';
@@ -132,14 +135,15 @@ namespace LibraryOfSparta.Classes
             Console.ForegroundColor = ConsoleColor.Yellow;
 
             pivotX++;
+            int percentage = (int)(pivotMaxX * ((double)enemyATB / enemyMaxATB));
 
-            for (int i = 0; i < enemyATB; i++)
+            for (int i = 0; i < percentage; i++)
             {
                 Console.SetCursorPosition(pivotX + i, pivotY + 1);
                 Console.Write(bar);
             }
             Console.ResetColor();
-            for (int i = enemyATB; i < pivotMaxX; i++)
+            for (int i = percentage; i < pivotMaxX; i++)
             {
                 Console.SetCursorPosition(pivotX + i, pivotY + 1);
                 Console.Write(' ');
@@ -184,36 +188,41 @@ namespace LibraryOfSparta.Classes
             }
         }
 
-        public void UpdateCardQueue()
+        public void UpdateCardQueue(List<int> hands)
         {
             int x = 82;
             int endY = 20;
-
-            // Card Queue Indexing
-            List<string> hands = new List<string>();
-            hands.Add("1 코스트\n가벼운 공격");
-            hands.Add("2 코스트\n집중 공격");
-            hands.Add("1 코스트\n가벼운 공격");
-            hands.Add("1 코스트\n회피");
 
             int handStart = endY - 1;
 
             string cardFrame = new string('─', 16);
 
+            string blank = "            ";
+
             for (int i = 0; i < hands.Count; i++)
             {
-                string[] temp = hands[i].Split('\n');
+                string[] temp = cardDataLines[hands[i]].Split(',');
 
+                Console.SetCursorPosition(x + 2, handStart);
+                Console.Write(blank);
                 Console.SetCursorPosition(x + 2, handStart);
                 Console.Write(cardFrame);
                 Console.SetCursorPosition(x + 2, handStart - 1);
+                Console.Write(blank);
+                Console.SetCursorPosition(x + 2, handStart - 1);
                 Console.Write(temp[1]);
                 Console.SetCursorPosition(x + 2, handStart - 2);
+                Console.Write(blank);
                 Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.SetCursorPosition(x + 2, handStart - 2);
                 Console.Write(temp[0]);
                 Console.ResetColor();
                 Console.SetCursorPosition(x + 2, handStart - 3);
+                Console.Write(blank);
+                Console.SetCursorPosition(x + 2, handStart - 3);
                 Console.Write(cardFrame);
+                Console.SetCursorPosition(x + 22, handStart - 1);
+                Console.Write(blank);
                 Console.SetCursorPosition(x + 22, handStart - 1);
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write("[{0}]", 1 + i);
@@ -359,8 +368,6 @@ namespace LibraryOfSparta.Classes
                 default:
                     break;
             }
-
-            
         }
 
         public void RenderPlayerStatus(Player player)

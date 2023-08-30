@@ -3,6 +3,7 @@ using System.Timers;
 using System.Threading;
 using System.Runtime.InteropServices;
 using LibraryOfSparta.Managers;
+using System.Xml.Linq;
 
 namespace LibraryOfSparta.Classes
 {
@@ -12,6 +13,9 @@ namespace LibraryOfSparta.Classes
         Enemy    enemy { get; set; } = null;
         BattleUI battleUI { get; set; } = null;
 
+        List<int> playerHands = new List<int>();
+        List<int> deck;
+
         string[] floorData = null;
 
         int playerEmotion = 0;
@@ -20,7 +24,6 @@ namespace LibraryOfSparta.Classes
         int enemyToken = 0;
         int playerCost = 0;
         int playerCostFilled = 0;
-        int playerHands = 0;
         int playerDrawFilled = 0;
         int enemyFilled = 0;
 
@@ -36,7 +39,6 @@ namespace LibraryOfSparta.Classes
             playerCost = 0;
             playerCostFilled = 0;
 
-            playerHands = 0;
             playerDrawFilled = 0;
 
             string battleUIData = Core.GetData(Define.BATTLE_DATA_PATH);
@@ -47,7 +49,7 @@ namespace LibraryOfSparta.Classes
             battleUI = new BattleUI();
             battleUI.Init();
 
-            enemy  = new Enemy(int.Parse(floorData[4]), int.Parse(floorData[4]), floorData[3]);
+            enemy  = new Enemy(int.Parse(floorData[4]), int.Parse(floorData[4]), floorData[3], battleUI.RenderEnemyHPBar);
             player = new Player(battleUI.RenderPlayerHPBar);
 
             // Draw enemy
@@ -56,9 +58,11 @@ namespace LibraryOfSparta.Classes
             battleUI.RenderEnemyATBBar();
             battleUI.DrawEnemy(Define.IMAGE_PATH + "/Img_" + floorData[2] + ".txt");
 
-            // Draw Card Queue
             battleUI.RenderCardQueue();
-            battleUI.UpdateCardQueue();
+            InitDeck();
+            AddCardToHand();
+            AddCardToHand();
+            AddCardToHand();
 
             // battleUI status
             battleUI.RenderPlayerHPBar(player.Hp, player.MaxHp);
@@ -67,7 +71,16 @@ namespace LibraryOfSparta.Classes
             UpdateEmotion();
 
             enemy.SetPattern();
-            battleUI.RenderBattleDialog("장윤서 매니저", "TIL 작성 하셔야죠?");
+
+            switch(battleIndex)
+            {
+                case 0:
+                battleUI.RenderBattleDialog("장윤서 매니저", "TIL 작성 하셔야죠?");
+                    break;
+                case 1:
+                battleUI.RenderBattleDialog("강인 튜터", "...");
+                    break;
+            }
         }
 
         public void UpdateEmotion()
@@ -127,20 +140,87 @@ namespace LibraryOfSparta.Classes
 
         public void UpdatePlayerDraw()
         {
-            playerDrawFilled += player.Fcs / 15;
+            playerDrawFilled += player.Fcs / 10;
 
             if (playerDrawFilled >= 31)
             {
                 playerDrawFilled = 0;
 
-
-                if (playerHands >= 4)
+                if (playerHands.Count >= 4)
                 {
-
+                    RemoveCardFromHand(0);
+                    AddCardToHand();
+                }
+                else
+                {
+                    AddCardToHand();
                 }
             }
 
             battleUI.RenderPlayerDrawATBBar(playerDrawFilled);
+        }
+
+        public void AddCardToHand()
+        {
+            for(int i = 0; i < deck.Count; i++)
+            {
+                if (deck[i] != -1)
+                {
+                    playerHands.Add(deck[i]);
+                    deck[i] = -1;
+                    battleUI.UpdateCardQueue(playerHands);
+                    return;
+                }
+            }
+
+            InitDeck();
+
+            playerHands.Add(deck[0]);
+            deck[0] = -1;
+
+            battleUI.UpdateCardQueue(playerHands);
+        }
+
+        public void RemoveCardFromHand(int index)
+        {
+            if(index >= playerHands.Count)
+            {
+                Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
+                return;
+            }
+
+            playerHands.RemoveAt(index);
+
+            battleUI.UpdateCardQueue(playerHands);
+        }
+
+        public void InitDeck()
+        {
+            deck = new List<int>();
+
+            foreach(int element in Core.SaveData.Deck)
+            {
+                deck.Add(element);
+            }
+
+            Random random = new Random();
+
+            for(int i = 0; i < 500; i++)
+            {
+                int a = random.Next(0, deck.Count);
+                int b = random.Next(0, deck.Count);
+
+                if(a == b)
+                {
+                    continue;
+                }
+                else
+                {
+                    int temp = deck[a];
+                    deck[a] = deck[b];
+                    deck[b] = temp;
+                }
+            }
         }
 
         public void UpdateEnemyATB()
