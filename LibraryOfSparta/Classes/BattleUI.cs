@@ -12,7 +12,9 @@ namespace LibraryOfSparta.Classes
         ATK,
         BUFF,
         VICTORY,
-        DEFEAT
+        DEFEAT,
+        EVADE,
+        DEF
     }
 
     public class BattleUI
@@ -85,12 +87,20 @@ namespace LibraryOfSparta.Classes
 
         public void RenderEnemyHPBar(int enemyHP = 1000, int enemyMaxHP = 1000)
         {
+            if(enemyHP <= 0)
+            {
+                return;
+            }
+
             int pivotX    = 3;
             int pivotY    = 4;
             int pivotMaxX = 50;
             char side     = '|';
             char bar      = '█';
+            string blank = "                            ";
 
+            Console.SetCursorPosition(pivotX, pivotY);
+            Console.Write(blank);
             Console.SetCursorPosition(pivotX, pivotY);
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("체력 : {0}/{1}", enemyHP, enemyMaxHP);
@@ -124,7 +134,10 @@ namespace LibraryOfSparta.Classes
             int pivotMaxX = 50;
             char side = '|';
             char bar = '█';
+            string blank = "                                                                   ";
 
+            Console.SetCursorPosition(pivotX, pivotY);
+            Console.Write(blank);
             Console.SetCursorPosition(pivotX, pivotY);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(enemySkillName);
@@ -197,37 +210,43 @@ namespace LibraryOfSparta.Classes
 
             string cardFrame = new string('─', 16);
 
-            string blank = "            ";
+            string blank = "                 ";
+
+            for(int i = 0; i < 4; i++)
+            {
+                Console.SetCursorPosition(x + 2, handStart);
+                Console.Write(blank);
+                Console.SetCursorPosition(x + 2, handStart - 1);
+                Console.Write(blank);
+                Console.SetCursorPosition(x + 2, handStart - 2);
+                Console.Write(blank);
+                Console.SetCursorPosition(x + 2, handStart - 3);
+                Console.Write(blank);
+                Console.SetCursorPosition(x + 22, handStart - 1);
+                Console.Write(blank);
+                handStart -= 4;
+            }
+
+            handStart = endY - 1;
 
             for (int i = 0; i < hands.Count; i++)
             {
                 string[] temp = cardDataLines[hands[i]].Split(',');
 
                 Console.SetCursorPosition(x + 2, handStart);
-                Console.Write(blank);
-                Console.SetCursorPosition(x + 2, handStart);
                 Console.Write(cardFrame);
                 Console.SetCursorPosition(x + 2, handStart - 1);
-                Console.Write(blank);
-                Console.SetCursorPosition(x + 2, handStart - 1);
-                Console.Write(temp[1]);
-                Console.SetCursorPosition(x + 2, handStart - 2);
-                Console.Write(blank);
+                Console.Write(temp[3]);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.SetCursorPosition(x + 2, handStart - 2);
                 Console.Write(temp[0]);
                 Console.ResetColor();
                 Console.SetCursorPosition(x + 2, handStart - 3);
-                Console.Write(blank);
-                Console.SetCursorPosition(x + 2, handStart - 3);
                 Console.Write(cardFrame);
-                Console.SetCursorPosition(x + 22, handStart - 1);
-                Console.Write(blank);
                 Console.SetCursorPosition(x + 22, handStart - 1);
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write("[{0}]", 1 + i);
                 Console.ResetColor();
-
                 handStart -= 4;
             }
         }
@@ -241,6 +260,10 @@ namespace LibraryOfSparta.Classes
             char side = '|';
             char bar  = '█';
 
+            string blank = "                    ";
+
+            Console.SetCursorPosition(x, y + 1);
+            Console.Write(blank);
             Console.SetCursorPosition(x, y + 1);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write("보유 코스트 : {0}/{1}", playerCost, 10);
@@ -304,6 +327,10 @@ namespace LibraryOfSparta.Classes
 
         public void RenderPlayerHPBar(int playerHP = 48, int playerMaxHP = 100)
         {
+            if (playerHP <= 0)
+            {
+                return;
+            }
             // Draw HPBar
             int x = 3;
             int y = 33;
@@ -312,6 +339,7 @@ namespace LibraryOfSparta.Classes
 
             char side = '|';
             char bar  = '█';
+            string blank = "                ";
 
             Console.SetCursorPosition(x, y);
             Console.ForegroundColor = ConsoleColor.Red;
@@ -336,6 +364,8 @@ namespace LibraryOfSparta.Classes
             Console.Write(side);
 
             Console.SetCursorPosition(x + barLength+6, y);
+            Console.Write(blank);
+            Console.SetCursorPosition(x + barLength+6, y);
             Console.Write("{0}/{1}", playerHP, playerMaxHP);
         }
 
@@ -344,26 +374,46 @@ namespace LibraryOfSparta.Classes
             int x = 3;
             int y = 30;
 
+            string blank = "                                                        ";
             
             Console.SetCursorPosition(x, y);
-            
+            Console.Write(blank);
 
+            Console.SetCursorPosition(x, y);
             switch (situlation)
             {
                 case BattleSitulation.NONE:
                     Console.Write("{0}", caster);
                     Console.SetCursorPosition(x, y + 1);
+                    Console.Write(blank);
+                    Console.SetCursorPosition(x, y + 1);
                     Console.Write("{0}", target);
                     break;
                 case BattleSitulation.ATK:
-                    Console.Write("{0}의 {1}!", caster, skillName);
+                    Console.Write("{0}의 {1}", caster, skillName);
                     Console.ForegroundColor = ConsoleColor.Red;
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write(blank);
                     Console.SetCursorPosition(x, y + 1);
                     Console.Write("{0}는 {1} 대미지를 받았다!", target, power);
                     break;
                 case BattleSitulation.BUFF:
                     Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.Write("{0}의 {1}!", caster, skillName);
+                    Console.Write("{0}의 {1}", caster, skillName);
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write(blank);
+                    break;
+                case BattleSitulation.EVADE:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("공격을 피했다!");
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write(blank);
+                    break;
+                case BattleSitulation.DEF:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("공격을 막아 {0} 대미지를 받았다!", power);
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write(blank);
                     break;
                 default:
                     break;
@@ -376,65 +426,87 @@ namespace LibraryOfSparta.Classes
             int x = 4;
             int y = 36;
 
-            int emotionLevel = 1;
-            int atkbuffs = 0;
-            int defBuffs = 5;
-            int spdBuffs = 0;
-            int focusBuffs = 0;
+            string blank = "                          ";
 
             Console.ForegroundColor = ConsoleColor.Gray;
+            Console.SetCursorPosition(x, y);
+            Console.Write(blank);
             Console.SetCursorPosition(x, y);
             Console.Write("❤ 스테이터스");
             Console.ResetColor();
             Console.SetCursorPosition(x, y + 2);
-            Console.Write("✊ 힘   : {0} + {1} ({2})", player.Str, emotionLevel + atkbuffs, player.Str + emotionLevel + atkbuffs);
+            Console.Write(blank);
+            Console.SetCursorPosition(x, y + 2);
+
+            int strBuffValue = player.GetStr(false);
+            Console.Write("✊ 힘   : {0} + {1} + {2} ({3})", player.Str, player.Emotion, strBuffValue,  player.Str + player.Emotion + strBuffValue);
             Console.SetCursorPosition(x, y + 3);
-            Console.Write("⛨ 방어 : {0} + {1} ({2})", player.Def, emotionLevel + defBuffs, player.Def + emotionLevel + defBuffs);
+            Console.Write(blank);
+            Console.SetCursorPosition(x, y + 3);
+
+            int defBuffValue = player.GetDef(false);
+            Console.Write("⛨ 방어 : {0} + {1} + {2} ({3})", player.Def, player.Emotion, defBuffValue, player.Def + player.Emotion + defBuffValue);
             Console.SetCursorPosition(x, y + 4);
-            Console.Write("≫ 속도 : {0} + {1} ({2})", player.Spd, emotionLevel + spdBuffs, player.Spd + emotionLevel + spdBuffs);
+            Console.Write(blank);
+            Console.SetCursorPosition(x, y + 4);
+            Console.Write("≫ 속도 : {0} + {1} + {2} ({3})", player.Spd, player.Emotion, 0, player.Spd + player.Emotion);
             Console.SetCursorPosition(x, y + 5);
-            Console.Write("心 집중 : {0} + {1} ({2})", player.Fcs, emotionLevel + focusBuffs, player.Fcs + emotionLevel + focusBuffs);
+            Console.Write(blank);
+            Console.SetCursorPosition(x, y + 5);
+            Console.Write("心 집중 : {0} + {1} + {2} ({3})", player.Fcs, player.Emotion, 0, player.Fcs + player.Emotion);
         }
 
-        public void RenderPlayerBuffStatus()
+        public void RenderPlayerBuffStatus(List<int> buffList, List<int> debuffList, string[] buffData)
         {
             int buffX = 34;
             int buffY = 36;
 
+            string blank = "             ";
+
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.SetCursorPosition(buffX, buffY);
+            Console.Write(blank);
+            Console.SetCursorPosition(buffX, buffY);
             Console.Write("버프");
-            List<string> buffList = new List<string>();
-            buffList.Add("회피");
-            buffList.Add("가벼운 방어");
 
             Console.ForegroundColor = ConsoleColor.DarkCyan;
-            for (int i = 0; i < buffList.Count; i++)
+            for (int i = 0; i < 10; i++)
             {
                 Console.SetCursorPosition(buffX, (buffY + 2) + i);
-                Console.Write(buffList[i]);
+                Console.Write(blank);
             }
+
+            for (int i = 0; i < buffList.Count; i++)
+            {
+                string[] buff = buffData[buffList[i]].Split(',');
+                Console.SetCursorPosition(buffX, (buffY + 2) + i);
+                Console.Write(buff[0]);
+            }
+
             Console.ResetColor();
 
             int debuffX = 50;
             int debuffY = buffY;
-            List<string> debuffList = new List<string>();
-            debuffList.Add("과제 2배");
-            debuffList.Add("과제 4배");
-            debuffList.Add("과제 2배");
-            debuffList.Add("과제 2배");
-            debuffList.Add("마비");
-            debuffList.Add("과제 2배");
 
             Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.SetCursorPosition(debuffX, debuffY);
+            Console.Write(blank);
             Console.SetCursorPosition(debuffX, debuffY);
             Console.Write("디버프");
 
             Console.ForegroundColor = ConsoleColor.Red;
-            for (int i = 0; i < debuffList.Count; i++)
+            for (int i = 0; i < 10; i++)
             {
                 Console.SetCursorPosition(debuffX, (debuffY + 2) + i);
-                Console.Write(debuffList[i]);
+                Console.Write(blank);
+            }
+
+            for (int i = 0; i < debuffList.Count; i++)
+            {
+                string[] buff = buffData[debuffList[i]].Split(',');
+
+                Console.SetCursorPosition(debuffX, (debuffY + 2) + i);
+                Console.Write(buff[0]);
             }
             Console.ResetColor();
         }

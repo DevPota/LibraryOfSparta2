@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using LibraryOfSparta.Common;
 using LibraryOfSparta.Managers;
 using LibraryOfSparta.Classes;
+using System.Reflection;
+using LibraryOfSparta;
+using System.Text;
+using System.Linq;
 
 public class DeckSetting : Scene
 {
@@ -85,11 +89,6 @@ public class DeckSetting : Scene
             Console.SetCursorPosition(10, 6);
             Console.WriteLine("\\__/\\__/ \\___/    \\_____/\\__|__/\\__|\\_/|_____/              \\__/\\__/ \\___/    |_____/\\_____/\\_____/|__|__\\");
         }// MY CARD, MY DECK
-        Console.ResetColor();
-        {
-            Console.SetCursorPosition(12, Define.SCREEN_Y - 22);
-            Console.Write("◀[Q]              {0}페이지               [W]▶", page);
-        }//방향표 페이지
         Console.ForegroundColor = ConsoleColor.Yellow;
         {
             Console.SetCursorPosition(10, Define.SCREEN_Y - 20);
@@ -121,7 +120,7 @@ public class DeckSetting : Scene
                 Console.Write("─");
             }
             Console.WriteLine("┐");
-        }// 인벤토리 가장 위ㅁ
+        }// 인벤토리 가장 위
         {
             for (int j = 0; j < Define.SCREEN_Y - 31; j++)
             {
@@ -173,9 +172,9 @@ public class DeckSetting : Scene
         }// 인벤토리 가장 아래
 
         {
-            Console.SetCursorPosition(12, Define.SCREEN_Y - 22);
-            Console.Write("◀[A]              {0}페이지               [D]▶   ", page);
-        }//방향표 페이지
+            Console.SetCursorPosition(9, Define.SCREEN_Y - 22);
+            Console.Write("[                       {0}/{1}                        ]", page, ((myCard.Count - 1) + 10) / 10);
+        }//페이지 표시
     }// 메인 창 그리기
 
     void DescriptionPanel()
@@ -305,23 +304,27 @@ public class DeckSetting : Scene
             {
                 Card card = new Card();
                 card = myCard[(page - 1) * 10 + cursor];
-                if (myCard.Count > 10)
+                
+                if (myCard.Count < (page * 10))
                 {
-                    Console.SetCursorPosition(13, 8 + ((myCard.Count % 10) - 1) * 2);
+                    Console.SetCursorPosition(13, 8 + (myCard.Count % 10) * 2);
                     Console.WriteLine("                                               ");
                 }
-                else
-                {
-                    Console.SetCursorPosition(13, 8 + (myCard.Count - 1) * 2);
-                    Console.WriteLine("                                               ");
-                }
+                InventoryPanel();
                 myCard.Remove(card);
+                Core.SaveData.Inventory.RemoveAt(card.index); // 카드 지우기 (완)
+                Core.Save();
             }
             else
             {
-
                 myCard.Add(myDeck[cursor]);
+                Core.SaveData.Inventory.Add(Core.SaveData.Deck[cursor]);   // 카드 내 인벤에 추가 (완)
+
                 myDeck.Remove(myDeck[cursor]);
+                Core.SaveData.Deck.Remove(Core.SaveData.Deck[cursor]);   // 카드 내 덱이서 삭제 (완)
+
+                Core.Save();
+
                 Console.SetCursorPosition(73, 8 + myDeck.Count * 2);
                 Console.WriteLine("                                               ");
             }
@@ -331,7 +334,8 @@ public class DeckSetting : Scene
         {
             Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
         }
-
+        Console.SetCursorPosition(9, Define.SCREEN_Y - 22);
+        Console.Write("[                       {0}/{1}                        ]", page, ((myCard.Count - 1) + 10) / 10);
     }// 카드 삭제
 
     void MyDeckAdd()
@@ -341,8 +345,21 @@ public class DeckSetting : Scene
             if (myDeck.Count < 10 && cursor_is_mycard)
             {
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Apply.wav");
-                myDeck.Add(myCard[(page - 1) * 10 + cursor]);
-                CardRemove();
+
+                myDeck.Add(myCard[(page - 1) * 10 + cursor]);              
+                Core.SaveData.Deck.Add(Core.SaveData.Inventory[(page - 1) * 10 + cursor]);          //내 덱에 추가
+
+                myCard.Remove(myCard[(page - 1) * 10 + cursor]);
+                Core.SaveData.Inventory.Remove(Core.SaveData.Inventory[(page - 1) * 10 + cursor]); // 카드 지우기 
+
+                Core.Save();
+                
+                if (myCard.Count < (page * 10))
+                {
+                    Console.SetCursorPosition(13, 8 + (myCard.Count % 10) * 2);
+                    Console.WriteLine("                                               ");
+                }
+                InventoryPanel();
             }
             else
             {
@@ -353,12 +370,16 @@ public class DeckSetting : Scene
         {
             Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
         }
+        Console.SetCursorPosition(9, Define.SCREEN_Y - 22);
+        Console.Write("[                       {0}/{1}                        ]", page, ((myCard.Count - 1) + 10) / 10);
     }// 카드 이동
       
     void Input()
     {
         Console.SetCursorPosition(2, Define.SCREEN_Y - 4);
-
+        {
+            Console.Write("[A]◀     [W]▲     [S]▼     [D]▶      [TAB]인벤토리/덱 선택      [ENTER]선택      [BACKSPACE]카드 삭제      [ESC] 뒤로가기");
+        }// 키 설명
         InputCheck();
     }// 입력 
 
@@ -460,11 +481,18 @@ public class DeckSetting : Scene
                 }
                 break;
             case ConsoleKey.Backspace :
-                CardRemove();
+                if(Core.SaveData.Inventory.Count + Core.SaveData.Deck.Count > 10)
+                {
+                    CardRemove();
+                }
+                else
+                {
+                    Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
+                }
                 break;
             case ConsoleKey.Escape :
                 Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
-                Core.LoadScene(1);
+                Core.LoadScene(7);
                 return;
         }
 
@@ -479,22 +507,23 @@ public class DeckSetting : Scene
             MyDeckDraw();
             CursorDraw();
         }
+
     }
 
     void InitCard()
     {
         string   cardData = Core.GetData(Define.CARD_DATA_PATH);
-        string[] lines    = cardData.Split('\n');
+        string[] lines    = cardData.Split('\n');//카드가 잘려서 들어감
 
         for(int i = 0; i < Core.SaveData.Inventory.Count; i++)
         {
-            Card newCard = new Card(lines[Core.SaveData.Inventory[i]].Split(','));
+            Card newCard = new Card(i, lines[Core.SaveData.Inventory[i]].Split(','));
             myCard.Add(newCard);
         }
 
         for (int i = 0; i < Core.SaveData.Deck.Count; i++)
         {
-            Card newCard = new Card(lines[Core.SaveData.Deck[i]].Split(','));
+            Card newCard = new Card(i, lines[Core.SaveData.Deck[i]].Split(','));
             myDeck.Add(newCard);
         }
     }
@@ -502,26 +531,20 @@ public class DeckSetting : Scene
 
 struct Card
 {
+    public int index;
     public string name;
     public CardType type;
     public int power;
     public int cost;
     public string info;
 
-    public Card(string[] data)
+    public Card( int Index,string[] data)
     {
+        index = Index;
         name   = data[0];
         type   = (CardType)int.Parse(data[1]);
         power  = int.Parse(data[2]);
         cost   = int.Parse(data[3]);
         info = data[6];
     }
-}
-
-enum CardType
-{
-    공격 = 0,
-    방어 = 1,
-    공격_자가버프 = 2,
-    회피 = 3,
 }

@@ -7,39 +7,39 @@ namespace LibraryOfSparta.Classes
 {
     public class TitleMenu : Scene
     {
+        int AnimationCursor;
+        List<LogoAnimation> AnimationList = null;
         LogoAnimation animation  = null;
         LogoAnimation animation2 = null;
+        LogoAnimation animation3 = null;
 
         BorderCursor Bcursor;
         int Icursor;
 
         List<Logo> cursorAbleLogo;
 
-        [DllImport("user32.dll")]
-        public static extern int ShowCursor(bool bShow);
-
         public void Init()
         {
+            Console.CursorVisible = false;
+
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Core.PlayPlayerBGM(Define.BGM_PATH + "/Menu.wav");
-
-            ShowCursor(false);
 
             Console.Clear();
             Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
 
             //타이틀 로고
-            Logo LibraryOfSparta = new Logo(3, 7, "img_LibraryOfSparta");
+            Logo LibraryOfSparta = new Logo(2, 6, "img_LibraryOfSparta");
             LibraryOfSparta.Draw();
 
             //커서가 사용할 로고
-            Logo Play = new Logo(5, 22, "img_Play");
+            Logo Play = new Logo(5, 20, "img_Play");
             Play.Draw();
 
-            Logo Credit = new Logo(5, 30, "img_Credit");
+            Logo Credit = new Logo(5, 28, "img_Credit");
             Credit.Draw();
 
-            Logo Quit = new Logo(5, 38, "img_Quit");
+            Logo Quit = new Logo(5, 36, "img_Quit");
             Quit.Draw();
 
             cursorAbleLogo = new List<Logo>();
@@ -57,21 +57,33 @@ namespace LibraryOfSparta.Classes
 
 
             //페이드인아웃 애니메이션
-            
-            Logo Keter = new Logo(90, 20, "img_Keter2");
+            AnimationCursor = 0;
+            Logo Keter = new Logo(60, 20, "img_Keter2");
+            Logo Malkuth = new Logo(25, 20, "img_Malkuth");
 
             animation = new LogoAnimation(Keter);
-            animation2 = new LogoAnimation(Keter);
+            animation2 = new LogoAnimation(Malkuth);
 
+            AnimationList = new List<LogoAnimation>(); 
+            AnimationList.Add(animation);
+            AnimationList.Add(animation2);
 
             Console.ResetColor();
 
             DrawInfoText();
         }
+
         public void Update()
         {
             //animation
-            animation.FadeLeft();
+            if (AnimationList[AnimationCursor].isEnd)
+            {
+                AnimationList[AnimationCursor].isEnd = false;
+                AnimationCursor = (AnimationCursor < AnimationList.Count-1) ? AnimationCursor+1 : 0;
+            }
+            if (AnimationCursor % 2 == 0) AnimationList[AnimationCursor].FadeLeft();
+            else AnimationList[AnimationCursor].FadeRight();
+
 
             ConsoleKeyInfo key = Core.GetKey();
 
@@ -105,6 +117,7 @@ namespace LibraryOfSparta.Classes
                             Core.LoadScene(1);
                             return;
                         case "img_Credit":
+                            Core.LoadScene(5);
                             return;
                         case "img_Quit":
                             Program.Exit();
@@ -119,6 +132,7 @@ namespace LibraryOfSparta.Classes
         public void DrawInfoText()
         {
             string info = "";
+            
 
             Console.ForegroundColor = ConsoleColor.DarkGreen;
 
@@ -141,18 +155,33 @@ namespace LibraryOfSparta.Classes
             Console.Write(info);
 
             Console.ResetColor();
+
+            string keyinfo =  "||   방향키, WASD : 이동   ||";
+            string keyinfo2 = "|| 엔터, 스페이스바 : 확인 ||";
+            Console.SetCursorPosition(1, Define.SCREEN_Y - 3);
+            Console.WriteLine(keyinfo);
+            Console.SetCursorPosition(1, Define.SCREEN_Y - 2);
+            Console.WriteLine(keyinfo2);
+
+
+            string devinfo = "팀 내배캠 부수기";
+            Console.SetCursorPosition(Define.SCREEN_X - devinfo.Length - 10, Define.SCREEN_Y - 2);
+            Console.WriteLine(devinfo);
+
+
         }
     }
+
 
     public class BorderCursor
     {
         public Logo logo;
-        char lt = '┌';
-        char tb = '─';
-        char rt = '┐';
-        char lr = '│';
-        char lb = '└';
-        char rb = '┘';
+        char lt = '╔';
+        char tb = '═';
+        char rt = '╦';
+        char lr = '║';
+        char lb = '╚';
+        char rb = '╩';
         char blank = ' ';
 
         public void Clear()
@@ -166,7 +195,6 @@ namespace LibraryOfSparta.Classes
             Console.SetCursorPosition(logo.x + logo.width, logo.y + logo.height);
             Console.Write(blank);
 
-            //Draw Side
             for (int i = logo.x; i < logo.x + logo.width; i++)
             {
                 Console.SetCursorPosition(i, logo.y - 1);
@@ -221,178 +249,6 @@ namespace LibraryOfSparta.Classes
         }
     }
 
-    public class Logo
-    {
-        public string imgName;
-        string img;
-        string[] lines;
-        public int x, y;
-        public int width, height;
-        char blank = ' ';
-
-        public Logo(int x, int y, string imgName)
-        {
-            this.x = x;
-            this.y = y;
-            this.imgName = imgName;
-
-            img = File.ReadAllText(Define.LOCAL_GAME_PATH + "/Images/" + imgName + ".txt");
-            lines = img.Split('\n');
-
-            width = lines[0].Length;
-            height = lines.Length;
-        }
-        public void Redefine(string imgName)
-        {
-            this.imgName = imgName;
-
-            img = File.ReadAllText(Define.LOCAL_GAME_PATH + "/Images/" + imgName + ".txt");
-            lines = img.Split('\n');
-
-            width = lines[0].Length;
-            height = lines.Length;
-        }
-
-
-        public void Draw()
-        {
-            for (int i = 0; i < height; i++)
-            {
-                Console.SetCursorPosition(x, y + i);
-                Console.Write(lines[i]);
-            }
-        }
-        public void Draw(int x, int y)
-        {
-            for (int i = 0; i < height; i++)
-            {
-                Console.SetCursorPosition(x, y + i);
-                Console.Write(lines[i]);
-            }
-        }
-
-        public void Clear()
-        {
-            for (int i = x; i < x+width; i++)
-            {
-                for (int j = y; j < y+height; j++)
-                {
-                    Console.SetCursorPosition(i, j);
-                    Console.Write(blank);
-                }
-            }
-        }
-        public void Clear(int x, int y)
-        {
-            for (int i = x; i < x + width; i++)
-            {
-                for (int j = y; j < y + height; j++)
-                {
-                    Console.SetCursorPosition(i, j);
-                    Console.Write(blank);
-                }
-            }
-        }
-
-        public void Relocation(int x, int y)
-        {
-            //this.Clear();
-            this.x = x;
-            this.y = y;
-            this.Draw();
-        }
-    }
-
-    public class LogoAnimation
-    {
-
-        public Logo logo;
-        public int frame;
-        int Maxframe = 70;
-        bool isEnd;
-        
-
-        public LogoAnimation(Logo logo)
-        {
-            this.logo = logo;
-            this.frame = 0;
-            this.isEnd = false;
-        }
-
-        public void Release()
-        {
-            isEnd = true;
-        }
-
-        public void Draw()
-        {
-            logo.Draw();
-            frame++;
-        }
-
-        public void RightClear() 
-        {
-            for (int j = logo.y; j < logo.y + logo.height; j++)
-            {
-                Console.SetCursorPosition(logo.x + logo.width - 1 - frame, j);
-                Console.Write(' ');
-            }
-        }
-        public void LeftDraw(ConsoleColor FontColor)
-        {
-            RightClear();
-            Console.ForegroundColor = FontColor;
-            logo.Draw(logo.x - frame, logo.y);
-            Console.ResetColor();
-            frame++;
-        }
-        public void FadeLeft()
-        {
-            if (frame < 7)
-            {
-                LeftDraw(ConsoleColor.DarkGray);
-            }
-            else if (frame < 14)
-            {
-                LeftDraw(ConsoleColor.Gray);
-            }
-            else if (frame < 21)
-            {
-                LeftDraw(ConsoleColor.White);
-            }
-            else if (frame < 35)
-            {
-                LeftDraw(ConsoleColor.White);
-            }
-            else if (frame < 42)
-            {
-                LeftDraw(ConsoleColor.White);
-            }
-            else if (frame < 49)
-            {
-                LeftDraw(ConsoleColor.Gray);
-            }
-            else if (frame < 56)
-            {
-                LeftDraw(ConsoleColor.DarkGray);
-            }
-            else if (frame == 56)
-            {
-                logo.Clear(logo.x - frame, logo.y);
-                frame++;
-            }
-            else if (frame < Maxframe)
-            {
-                frame++;
-            }
-            else if (frame == Maxframe)
-            {
-                isEnd = true;
-                frame = 0;
-            }
-
-            Console.SetCursorPosition(0, 0);
-        }
-    }
+    
 }
 

@@ -1,4 +1,4 @@
 NAME,POWER,TYPE,BUFF,SPEED,SFX_BEFORE,SFX_AFTER
-TIL,0,0,0,50,,
-작성하셨나요?,5,0,,100,,
-여러분 잘들리시나요?,20,0,,200,,
+TIL,0,0,3,10,-1,/Malkuth_0.wav
+작성하셨나요?,3,1,-1,15,-1,/Malkuth_1.wav
+여러분 잘들리시나요?,10,1,-1,20,-1,/Malkuth_2.wav
