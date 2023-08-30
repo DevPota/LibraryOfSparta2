@@ -37,7 +37,7 @@ namespace LibraryOfSparta.Classes
         public int Token   { get; set; } = 0;
         public int enemyFilled { get; set; } = 0;
 
-        public List<int> BuffList = new List<int>();
+        public List<int> BuffList   = new List<int>();
         public List<int> DebuffList = new List<int>();
 
         Queue<int> patternQueue = new Queue<int>();
