@@ -1,11 +1,7 @@
 ﻿using LibraryOfSparta.Classes;
 using LibraryOfSparta.Common;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace LibraryOfSparta.Managers
 {
@@ -14,7 +10,7 @@ namespace LibraryOfSparta.Managers
         public string BGMAlias { get; set; }
         AudioSource        BGM      = null;
 
-        string currentBGMPath = "";
+        public string CurrentBGMPath = "";
         bool isPaused = false;
 
         int idx = 0;
@@ -26,18 +22,20 @@ namespace LibraryOfSparta.Managers
 
         public void PlayBGM(string path)
         {
-            if(currentBGMPath == path)
+            if(BGM.Isloaded == true)
             {
-                return;
-            }
-            else
-            {
-                currentBGMPath = path;
+                BGM.StopPlaying();
                 BGM.ForceStopAll();
+            }
 
-                BGM = new AudioSource();
-                BGM.LoadMediaFile(path, BGMAlias + idx++);
-                BGM.PlayLoop();
+            CurrentBGMPath = path;
+            BGM = new AudioSource();
+            BGM.LoadMediaFile(path, BGMAlias);
+            BGM.PlayFromStart();
+
+            if (BGM.IsPaused == true)
+            {
+                BGM.Pause();
             }
         }
 
@@ -50,28 +48,54 @@ namespace LibraryOfSparta.Managers
 
         public void PauseBGM()
         {
-            if(isPaused == true)
+            if(BGM.IsPaused == true)
             {
                 return;
             }
             else
             {
                 BGM.Pause();
-                isPaused = true;
+                BGM.IsPaused = true;
             }
         }
 
         public void ResumeBGM()
         {
-            if(isPaused == true)
+            if(BGM.IsPaused == true)
             {
                 BGM.Resume();
-                isPaused = false;
+                BGM.IsPaused = false;
             }
             else
             {
                 return;
             }
+        }
+
+        public void StopBGM()
+        {
+            BGM.StopPlaying();
+            BGM.ForceStopAll();
+        }
+
+        public int GetCurrentPlayed()
+        {
+            return BGM.CurrentPlayed;
+        }
+
+        public int GetLength()
+        {
+            return BGM.Length;
+        }
+
+        public void SetCurrentPlayed(int value)
+        {
+            BGM.CurrentPlayed = value;
+        }
+
+        public bool GetPaused()
+        {
+            return BGM.IsPaused;
         }
     }
 
@@ -142,17 +166,20 @@ namespace LibraryOfSparta.Managers
             Data.Init();
             Input.Init();
             Sound[0] = new SoundModule();
-            Sound[1] = new SoundModule();
             Sound[0].Init();
-            Sound[1].Init();
             Sound[0].BGMAlias = "PlayerBGM";
-            Sound[1].BGMAlias = "EnemyBGM";
 
             SaveData = Data.LoadData<GameData>(Define.SAVE_PATH);
             Save();
         }
 
         #region Sound
+        public static void InitEnemySound()
+        {
+            Sound[1] = new SoundModule();
+            Sound[1].Init();
+            Sound[1].BGMAlias = "EnemyBGM";
+        }
         public static void PlayPlayerBGM(string path)
         {
             Sound[0].PlayBGM(path);
@@ -186,6 +213,17 @@ namespace LibraryOfSparta.Managers
         public static void PlaySFX(string path)
         {
             Sound[0].PlaySFX(path);
+        }
+
+        public static void StopPlayerBGM()
+        {
+            Sound[0].StopBGM();
+        }
+
+        public static void StopEnemyBGM()
+        {
+            Sound[1].StopBGM();
+            Sound[1] = null;
         }
         #endregion
 
@@ -259,6 +297,7 @@ namespace LibraryOfSparta.Managers
                     ((TitleMenu)CurrentScene).Init();
                     break;
                 case 1:
+                    PlayPlayerBGM(Define.BGM_PATH + "/Entrance.wav");
                     CurrentScene = new Entrance();
                     ((Entrance)CurrentScene).Init();
                     break;
@@ -272,14 +311,21 @@ namespace LibraryOfSparta.Managers
                     CurrentScene = temp;
                     break;
                 case 4:
+                    Scene battleTemp = CurrentScene;
                     CurrentScene = new Result();
-                    ((Result)CurrentScene).Init();
+                    ((Result)CurrentScene).Init(((Battle)battleTemp).GetEnemyEmotionLevel(), ((Battle)battleTemp).Floor);
                     break;
                 case 5:
+                    CurrentScene = new Credit();
+                    ((Credit)CurrentScene).Init();
                     break;
                 case 6:
                     break;
-
+                case 7:
+                    SceneIndex = 1;
+                    CurrentScene = new Entrance();
+                    ((Entrance)CurrentScene).Init();
+                    break;
             }
         }
 
@@ -292,6 +338,20 @@ namespace LibraryOfSparta.Managers
         {
             SceneIndex = -1;
             CurrentScene = null;
+        }
+
+        public static void BGMUpdate()
+        {
+            if (Sound[0].GetLength() <= Sound[0].GetCurrentPlayed())
+            {
+                Sound[0].SetCurrentPlayed(0);
+                Sound[0].PlayBGM(Sound[0].CurrentBGMPath);
+            }
+            if (Sound[1] != null && Sound[1].GetLength() <= Sound[1].GetCurrentPlayed())
+            {
+                Sound[1].SetCurrentPlayed(0);
+                Sound[1].PlayBGM(Sound[1].CurrentBGMPath);
+            }
         }
     }
 }

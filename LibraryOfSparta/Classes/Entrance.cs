@@ -2,6 +2,7 @@ using LibraryOfSparta.Classes;
 using LibraryOfSparta.Common;
 using LibraryOfSparta.Managers;
 using System;
+using System.Drawing;
 using System.Reflection;
 using System.Text;
 
@@ -9,6 +10,7 @@ namespace LibraryOfSparta
 {
     public class Entrance : Scene
     {
+        Random random = new Random();
         public enum EntranceMenu
         {
             MENU_SELECT,
@@ -23,12 +25,14 @@ namespace LibraryOfSparta
 
         public void Init()
         {
-            Core.PlayPlayerBGM(Define.BGM_PATH + "/Entrance.wav");
-
             string battleData = Core.GetData(Define.BATTLE_DATA_PATH);
             floorData = battleData.Split('\n');
 
             DrawPanel();
+
+            //㉾
+            DrawStar();
+            DrawBackGround();
             DrawTower();
 
             DrawMenu();
@@ -99,26 +103,134 @@ namespace LibraryOfSparta
             Console.ResetColor();
         }
 
-
-        public void DrawTower()
+        public void DrawBackGround()//㉾
         {
+            for (int i = 0; i < 28; i++)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.SetCursorPosition(35, Define.SCREEN_Y - (8 + i));
+                Console.Write("███████████████");
 
-            for (int i = 0; i < 30; i++)
+                if(i < 18)
+                {
+                    Console.SetCursorPosition(6, Define.SCREEN_Y - (8 + i));
+                    Console.Write("████████████");
+                }
+
+            }
+
+
+            for (int i = 0; i < 15; i++)
             {
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.SetCursorPosition(31, Define.SCREEN_Y - (7 + i));
-                Console.Write("█▒▒▒█ ◈ █▒▒▒█");
+                Console.SetCursorPosition(37, Define.SCREEN_Y - (8 + i));
+                Console.Write("███████");
+
+                Console.SetCursorPosition(22, Define.SCREEN_Y - (8 + i));
+                Console.Write("████████");
+                if(i < 10 )
+                {
+                    Console.SetCursorPosition(10, Define.SCREEN_Y - (8 + i));
+                    Console.Write("███████████");
+                }
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.SetCursorPosition(32, Define.SCREEN_Y - (8 + i));
+                Console.Write("████");
+
+                Console.SetCursorPosition(7, Define.SCREEN_Y - (8 + i));
+                Console.Write("█████");
+
+                if(i < 3)
+                {
+                    Console.SetCursorPosition(17, Define.SCREEN_Y - (8 + i));
+                    Console.Write("███");
+                }
+            }
+        }
+
+        public void DrawStar()
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                int x = random.Next(5, 74);
+                x = x % 2 == 1 ? x : x + 1; 
+
+                int y = random.Next(8, 45 );
+                y = x % 2 == 1 ? y : y + 1;
+
+                if(x > 47)
+                {
+                    y = random.Next(4, 13);
+                    y = x % 2 == 1 ? y : y + 1;
+                }
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.SetCursorPosition(x, y);
+                Console.Write("⠐");
+            }
+        }
+
+        public void DrawTower()//㉾
+        {
+            for (int i = 0; i < 27; i++)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.SetCursorPosition(45, Define.SCREEN_Y - (10 + i));
+                Console.Write("█▒▒▒▒▒▒█████▒▒▒▒▒▒█");
                 if (i % 3 == 0 && i != 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.SetCursorPosition(30, Define.SCREEN_Y - (7 + i));
-                    Console.Write("X···XX···X");
+                    Console.SetCursorPosition(45, Define.SCREEN_Y - (10 + i));
+                    Console.Write("≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘");
                     int j = i / 3 - 1;
                 }
+
+                if (i == 13 || i == 14)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.SetCursorPosition(45, Define.SCREEN_Y - (10 + i));
+                    Console.Write("█▒▒▒▒▒▒█████▒▒▒▒▒▒█");
+                }
+
+                if (i == 25 || i == 26)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.SetCursorPosition(45, Define.SCREEN_Y - (10 + i));
+                    Console.Write("█▒▒▒▒▒▒█████▒▒▒▒▒▒█");
+                }
+                if(i == 26)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.SetCursorPosition(45, Define.SCREEN_Y - 37);
+                    Console.Write("≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘≘");
+
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.SetCursorPosition(47, Define.SCREEN_Y - 40);
+                    Console.Write("███████████████");
+                    Console.SetCursorPosition(45, Define.SCREEN_Y - 39);
+                    Console.Write("███████     ███████");
+                    Console.SetCursorPosition(45, Define.SCREEN_Y - 38);
+                    Console.Write("███████▃▃▃▃▃███████");
+                }
             }
-            Console.SetCursorPosition(21, Define.SCREEN_Y - 7);
+            //기반
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.SetCursorPosition(45, Define.SCREEN_Y - 10);
+            Console.Write("███████▃▃▃▃▃███████");
+
+            Console.SetCursorPosition(43, Define.SCREEN_Y - 9);
+            Console.Write("████▒▒▒▒▒▐   ▌▒▒▒▒▒████");
+            Console.SetCursorPosition(41, Define.SCREEN_Y - 8);
+            Console.Write("▗▟████▒▒▒▒▒▐   ▌▒▒▒▒▒████▙▖");
+
+            //바닥
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("〓〓■■■▒░A۞A▣▣A۞A░▒■■■〓〓");
+            Console.SetCursorPosition(5, Define.SCREEN_Y - 7);
+            Console.Write(new string('█', Define.SCREEN_X - 59)); //5~71 = 66
+
         }
 
         public void DrawMenu()
@@ -138,7 +250,7 @@ namespace LibraryOfSparta
             Console.ResetColor();
         }
 
-        public void DrawPanel()
+        public void DrawPanel()//㉾
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.SetCursorPosition(2, 2);
@@ -180,6 +292,26 @@ namespace LibraryOfSparta
             Console.SetCursorPosition(80, 31);
 
             Console.ResetColor();
+        }
+        public void DrawSelectText()//㉾
+        {
+
+            Console.SetCursorPosition(6, Define.SCREEN_Y - 46);
+            Console.Write("╔═╗┌─┐ ┬  ┌─┐┌─┐┌┬┐  ╔══╗┬  ┌─┐┌─┐ ┬─ ┐  ");
+            Console.SetCursorPosition(6, Define.SCREEN_Y - 45);
+            Console.Write("╚═╗├┤  │  ├┤ │   │   ╠═╣ │  │ ││ │ ├ ┬┘  ");
+            Console.SetCursorPosition(6, Define.SCREEN_Y - 44);
+            Console.Write("╚═╝└─┘ ┴─┘└─┘└─┘ ┴   ╚   ┴─┘└─┘└─┘ ┴ └─  ");
+        }
+        public void RemoveSelectText()//㉾
+        {
+
+            Console.SetCursorPosition(6, Define.SCREEN_Y - 46);
+            Console.Write("                                       ");
+            Console.SetCursorPosition(6, Define.SCREEN_Y - 45);
+            Console.Write("                                       ");
+            Console.SetCursorPosition(6, Define.SCREEN_Y - 44);
+            Console.Write("                                         ");
         }
 
         public void Update()
@@ -237,10 +369,10 @@ namespace LibraryOfSparta
                         break;
                     case ConsoleKey.Spacebar:
                     case ConsoleKey.Enter:
-                        Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
                         if (CurrentMenu == EntranceMenu.MENU_SELECT)
                         {
-                            switch(CursorIndex)
+                            Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
+                            switch (CursorIndex)
                             {
                                 case 0 :
                                     CurrentMenu = EntranceMenu.FLOOR_SELECT;
@@ -251,6 +383,7 @@ namespace LibraryOfSparta
                                     Console.Write("ENTER를 눌러 시작");
                                     Console.SetCursorPosition(84, 28);
                                     Console.Write("ESC를 눌러 뒤로가기");
+                                    DrawSelectText(); //㉾
                                     break;
                                 case 1:
                                     Core.LoadScene(2);
@@ -262,8 +395,17 @@ namespace LibraryOfSparta
                         }
                         else if(CurrentMenu == EntranceMenu.FLOOR_SELECT)
                         {
-                            Core.LoadScene(3);
-                            return;
+                            if(Core.SaveData.Deck.Count != 10)
+                            {
+                                Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
+                                return;
+                            }
+                            else
+                            {
+                                Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
+                                Core.LoadScene(3);
+                                return;
+                            }
                         }
                         break;
                     case ConsoleKey.Escape:
@@ -277,7 +419,7 @@ namespace LibraryOfSparta
                             Console.Write("                     ");
                             Console.SetCursorPosition(70, (41 - (CursorIndex * 3)));
                             Console.Write("  ");
-
+                            RemoveSelectText();//㉾
 
                             CursorIndex = 0;
                         }
@@ -315,10 +457,10 @@ namespace LibraryOfSparta
             int cut = 20;
 
             Console.SetCursorPosition(x, y);
-            for (int i = 0; i < data[9].Length; i++)
+            for (int i = 0; i < data[6].Length; i++)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(data[9][i]);
+                Console.Write(data[6][i]);
                 Console.ResetColor();
                 if((i+1) % cut == 0)
                 {

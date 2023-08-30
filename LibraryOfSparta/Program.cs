@@ -40,7 +40,11 @@ class Program
 
     static void Update()
     {
-        switch(Core.SceneIndex)
+        Console.SetWindowSize(Define.SCREEN_X, Define.SCREEN_Y);
+
+        Core.BGMUpdate();
+
+        switch (Core.SceneIndex)
         {
             case 0:
                 ((TitleMenu)Core.CurrentScene).Update();
@@ -56,6 +60,9 @@ class Program
                 break;
             case 4:
                 ((Result)Core.CurrentScene).Update();
+                break;
+            case 5:
+                ((Credit)Core.CurrentScene).Update();
                 break;
         }
 
