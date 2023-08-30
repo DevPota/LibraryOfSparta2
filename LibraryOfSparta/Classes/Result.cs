@@ -122,6 +122,17 @@ namespace LibraryOfSparta
         }
         public void Select(int n)
         {
+            // if (카드 인벤토리가 꽉찼다면)
+            //{
+            //Console.SetCursorPosition(D.SCREEN_X - 128, D.SCREEN_Y - 3);
+            //Console.Write("                                       ");
+            //Console.ForegroundColor = ConsoleColor.DarkRed;
+            //Console.SetCursorPosition(D.SCREEN_X - 128, D.SCREEN_Y - 3);
+            //Console.Write("인벤토리가 가득 찼습니다.");
+            //Console.ResetColor();
+            //}
+            //else
+            //{
             switch (n)
             {
                 case 0:
@@ -143,6 +154,7 @@ namespace LibraryOfSparta
                     Console.Write("던전 선택창으로 이동합니다.");
                     break;
             }
+            //}
         }
 
         public void Init(int battleScore = 3)
