@@ -54,6 +54,9 @@ class Program
             case 3:
                 ((Battle)Core.CurrentScene).Update();
                 break;
+            case 4:
+                ((Result)Core.CurrentScene).Update();
+                break;
         }
 
         Core.ReleaseKey();

@@ -35,8 +35,9 @@ namespace LibraryOfSparta.Classes
         Queue<int> patternQueue = new Queue<int>();
 
         public EnemySkill CurrentSkill = null;
+        Action<int, int> UIListener = (int i, int j) => { };
 
-        public Enemy(int hp, int maxHp, string pattern)
+        public Enemy(int hp, int maxHp, string pattern, Action<int, int> uIAction)
         {
             this.Hp = hp;
             this.MaxHp = maxHp;
@@ -47,6 +48,8 @@ namespace LibraryOfSparta.Classes
             {
                 patternQueue.Enqueue(int.Parse(temp));
             }
+
+            UIListener = uIAction;
         }
 
         public void SetPattern()
@@ -89,6 +92,13 @@ namespace LibraryOfSparta.Classes
                     player.OnHit(CurrentSkill.Power);
                     break;
             }
+        }
+
+        public void OnHit(int damage)
+        {
+            // 버프, 디버프 계산 나중에 추가
+            Hp -= damage;
+            UIListener(Hp, MaxHp);
         }
     }
 }

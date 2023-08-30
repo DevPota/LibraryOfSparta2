@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System;
 using LibraryOfSparta.Common;
-using Microsoft.VisualBasic;
 using LibraryOfSparta.Managers;
 using LibraryOfSparta.Classes;
 
 public class DeckSetting : Scene
 {
-    List<Card> myCrad = new List<Card>();
+    List<Card> myCard = new List<Card>();
     List<Card> myDeck = new List<Card>();
 
     int page = 1;
@@ -17,13 +14,9 @@ public class DeckSetting : Scene
 
     bool cursor_is_mycard = true;
 
-    string input;
-
     public void Init()
     {
-        //Core.PlayPlayerBGM(Define.BGM_PATH + "/Entrance.wav");
-
-        TestCard();
+        InitCard();
         MainPanel();
         InventoryPanel();
 
@@ -222,21 +215,21 @@ public class DeckSetting : Scene
             if (cursor_is_mycard)
             {
                 Console.SetCursorPosition(10, Define.SCREEN_Y - 15);
-                Console.WriteLine("카드  이름 : {0}", myCrad[(page - 1) * 10 + cursor].name);
+                Console.WriteLine("카드  이름 : {0}", myCard[(page - 1) * 10 + cursor].name);
                 Console.SetCursorPosition(10, Define.SCREEN_Y - 13);
                 Console.Write("카드  파워 : ");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("({0})", myCrad[(page - 1) * 10 + cursor].power);
+                Console.WriteLine("({0})", myCard[(page - 1) * 10 + cursor].power);
                 Console.ResetColor();
 
                 Console.SetCursorPosition(10, Define.SCREEN_Y - 12);
-                Console.WriteLine("카드  타입 : {0}", myCrad[(page - 1) * 10 + cursor].type);
+                Console.WriteLine("카드  타입 : {0}", myCard[(page - 1) * 10 + cursor].type);
                 Console.SetCursorPosition(10, Define.SCREEN_Y - 11);
                 Console.Write("카드 코스트: "); Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("({0})", myCrad[(page - 1) * 10 + cursor].cost); Console.ResetColor();
+                Console.WriteLine("({0})", myCard[(page - 1) * 10 + cursor].cost); Console.ResetColor();
 
                 Console.SetCursorPosition(10, Define.SCREEN_Y - 10);
-                Console.WriteLine("카드  설명 : {0}", myCrad[(page - 1) * 10 + cursor].dialog);
+                Console.WriteLine("카드  설명 : {0}", myCard[(page - 1) * 10 + cursor].info);
             }
             else
             {
@@ -252,7 +245,7 @@ public class DeckSetting : Scene
                 Console.WriteLine("({0})", myDeck[cursor].cost); Console.ResetColor();
 
                 Console.SetCursorPosition(10, Define.SCREEN_Y - 10);
-                Console.WriteLine("카드  설명 : {0}", myDeck[cursor].dialog);
+                Console.WriteLine("카드  설명 : {0}", myDeck[cursor].info);
             }
         }
         catch
@@ -266,10 +259,10 @@ public class DeckSetting : Scene
         for (int i = 0; i < 10; i++)
         {
             int index = (page - 1) * 10 + i;
-            if (index < myCrad.Count)
+            if (index < myCard.Count)
             {
                 Console.SetCursorPosition(13, 8 + i * 2);
-                Console.Write("{0}", myCrad[index].name);
+                Console.Write("{0}", myCard[index].name);
             }
         }
     }// 내 카드 그리기
@@ -311,23 +304,23 @@ public class DeckSetting : Scene
             if (cursor_is_mycard)
             {
                 Card card = new Card();
-                card = myCrad[(page - 1) * 10 + cursor];
-                if (myCrad.Count > 10)
+                card = myCard[(page - 1) * 10 + cursor];
+                if (myCard.Count > 10)
                 {
-                    Console.SetCursorPosition(13, 8 + ((myCrad.Count % 10) - 1) * 2);
+                    Console.SetCursorPosition(13, 8 + ((myCard.Count % 10) - 1) * 2);
                     Console.WriteLine("                                               ");
                 }
                 else
                 {
-                    Console.SetCursorPosition(13, 8 + (myCrad.Count - 1) * 2);
+                    Console.SetCursorPosition(13, 8 + (myCard.Count - 1) * 2);
                     Console.WriteLine("                                               ");
                 }
-                myCrad.Remove(card);
+                myCard.Remove(card);
             }
             else
             {
 
-                myCrad.Add(myDeck[cursor]);
+                myCard.Add(myDeck[cursor]);
                 myDeck.Remove(myDeck[cursor]);
                 Console.SetCursorPosition(73, 8 + myDeck.Count * 2);
                 Console.WriteLine("                                               ");
@@ -343,12 +336,12 @@ public class DeckSetting : Scene
 
     void MyDeckAdd()
     {
-        if ((page - 1) * 10 + cursor < myCrad.Count)
+        if ((page - 1) * 10 + cursor < myCard.Count)
         {
             if (myDeck.Count < 10 && cursor_is_mycard)
             {
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Apply.wav");
-                myDeck.Add(myCrad[(page - 1) * 10 + cursor]);
+                myDeck.Add(myCard[(page - 1) * 10 + cursor]);
                 CardRemove();
             }
             else
@@ -387,7 +380,7 @@ public class DeckSetting : Scene
             case ConsoleKey.D :
             case ConsoleKey.RightArrow :
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
-                if ((page * 10) < myCrad.Count)
+                if ((page * 10) < myCard.Count)
                 {
                     page += 1;
                     InventoryPanel();
@@ -488,46 +481,47 @@ public class DeckSetting : Scene
         }
     }
 
-    void TestCard()
+    void InitCard()
     {
-        myCrad.Add(new Card("가벼운 공격", 10, (CardType)0, 1, "적에게 10 대미지를 준다"));
-        myCrad.Add(new Card("회피", 8, (CardType)1, 1, "8 이하의 다음 공격은 무조건 회피한다"));
-        myCrad.Add(new Card("가벼운 방어", 5, (CardType)2, 1, "다음 받는 대미지를 5 경감 시킨다"));
-        myCrad.Add(new Card("공격과 수비", 12, (CardType)3, 2, "적에게 12 대미지를 주고 다음 받는 대미지를 6 경감시킨다"));
-        myCrad.Add(new Card("집중 공격", 18, (CardType)0, 2, "적에게 18 대미지를 준다"));
-        myCrad.Add(new Card("가벼운 공격", 10, (CardType)0, 1, "적에게 10 대미지를 준다"));
-        myCrad.Add(new Card("회피", 8, (CardType)1, 1, "8 이하의 다음 공격은 무조건 회피한다"));
-        myCrad.Add(new Card("가벼운 방어", 5, (CardType)2, 1, "다음 받는 대미지를 5 경감 시킨다"));
-        myCrad.Add(new Card("공격과 수비", 12, (CardType)3, 2, "적에게 12 대미지를 주고 다음 받는 대미지를 6 경감시킨다"));
-        myCrad.Add(new Card("집중 공격", 18, (CardType)0, 2, "적에게 18 대미지를 준다"));
-        myCrad.Add(new Card("무거운 공격", 20, (CardType)0, 1, "적에게 20 대미지를 준다"));
+        string   cardData = Core.GetData(Define.CARD_DATA_PATH);
+        string[] lines    = cardData.Split('\n');
 
+        for(int i = 0; i < Core.SaveData.Inventory.Count; i++)
+        {
+            Card newCard = new Card(lines[Core.SaveData.Inventory[i]].Split(','));
+            myCard.Add(newCard);
+        }
 
-    }// 테스트 카드 세팅
+        for (int i = 0; i < Core.SaveData.Deck.Count; i++)
+        {
+            Card newCard = new Card(lines[Core.SaveData.Deck[i]].Split(','));
+            myDeck.Add(newCard);
+        }
+    }
 }
 
 struct Card
 {
     public string name;
-    public int power;
     public CardType type;
+    public int power;
     public int cost;
-    public string dialog;
+    public string info;
 
-    public Card(string name_, int power_, CardType typy_, int cost_, string dialog_)
+    public Card(string[] data)
     {
-        name = name_;
-        power = power_;
-        type = typy_;
-        cost = cost_;
-        dialog = dialog_;
+        name   = data[0];
+        type   = (CardType)int.Parse(data[1]);
+        power  = int.Parse(data[2]);
+        cost   = int.Parse(data[3]);
+        info = data[6];
     }
 }
 
 enum CardType
 {
-    공격,
-    회피,
-    방어,
-    공수
+    공격 = 0,
+    방어 = 1,
+    공격_자가버프 = 2,
+    회피 = 3,
 }

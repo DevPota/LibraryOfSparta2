@@ -315,10 +315,10 @@ namespace LibraryOfSparta
             int cut = 20;
 
             Console.SetCursorPosition(x, y);
-            for (int i = 0; i < data[8].Length; i++)
+            for (int i = 0; i < data[9].Length; i++)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(data[8][i]);
+                Console.Write(data[9][i]);
                 Console.ResetColor();
                 if((i+1) % cut == 0)
                 {
