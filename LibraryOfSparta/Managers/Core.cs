@@ -326,6 +326,20 @@ namespace LibraryOfSparta.Managers
                     CurrentScene = new Entrance();
                     ((Entrance)CurrentScene).Init();
                     break;
+                case 8:
+                    StopEnemyBGM();
+                    PlayPlayerBGM(Define.BGM_PATH + "/Entrance.wav");
+                    SceneIndex = 1;
+                    CurrentScene = new Entrance();
+                    ((Entrance)CurrentScene).Init();
+                    break;
+                case 9:
+                    SceneIndex = 4;
+                    Scene battleTemp2 = CurrentScene;
+                    CurrentScene = new Result();
+                    ((Result)CurrentScene).Init(-1, ((Battle)battleTemp2).Floor);
+                    break;
+
             }
         }
 

@@ -268,9 +268,9 @@ public class DeckSetting : Scene
 
     void MyDeckDraw()
     {
-        for (int i = 0; i<myDeck.Count; i++)
+        for (int i = 0; i < myDeck.Count; i++)
         {
-            Console.SetCursorPosition(73, 8 + i* 2);
+            Console.SetCursorPosition(73, 8 + i * 2);
             Console.Write("{0}", myDeck[i].name);
         }
     }// 내 덱 그리기
@@ -304,7 +304,7 @@ public class DeckSetting : Scene
             {
                 Card card = new Card();
                 card = myCard[(page - 1) * 10 + cursor];
-                
+
                 if (myCard.Count < (page * 10))
                 {
                     Console.SetCursorPosition(13, 8 + (myCard.Count % 10) * 2);
@@ -346,14 +346,14 @@ public class DeckSetting : Scene
             {
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Apply.wav");
 
-                myDeck.Add(myCard[(page - 1) * 10 + cursor]);              
+                myDeck.Add(myCard[(page - 1) * 10 + cursor]);
                 Core.SaveData.Deck.Add(Core.SaveData.Inventory[(page - 1) * 10 + cursor]);          //내 덱에 추가
 
                 myCard.Remove(myCard[(page - 1) * 10 + cursor]);
                 Core.SaveData.Inventory.Remove(Core.SaveData.Inventory[(page - 1) * 10 + cursor]); // 카드 지우기 
 
                 Core.Save();
-                
+
                 if (myCard.Count < (page * 10))
                 {
                     Console.SetCursorPosition(13, 8 + (myCard.Count % 10) * 2);
@@ -373,12 +373,12 @@ public class DeckSetting : Scene
         Console.SetCursorPosition(9, Define.SCREEN_Y - 22);
         Console.Write("[                       {0}/{1}                        ]", page, ((myCard.Count - 1) + 10) / 10);
     }// 카드 이동
-      
+
     void Input()
     {
         Console.SetCursorPosition(2, Define.SCREEN_Y - 4);
         {
-            Console.Write("[A]◀     [W]▲     [S]▼     [D]▶      [TAB]인벤토리/덱 선택      [ENTER]선택      [BACKSPACE]카드 삭제      [ESC] 뒤로가기");
+            Console.Write("[A]◀ [W]▲ [S]▼ [D]▶ [TAB]인벤토리/덱 선택 [Q]인벤토리 정렬 [E]덱 정렬 [ENTER]선택 [BACKSPACE]카드 삭제 [ESC]뒤로가기");
         }// 키 설명
         InputCheck();
     }// 입력 
@@ -386,11 +386,11 @@ public class DeckSetting : Scene
     void InputCheck()
     {
         ConsoleKeyInfo key = Core.GetKey();
-        
-        switch(key.Key)
+
+        switch (key.Key)
         {
-            case ConsoleKey.A :
-            case ConsoleKey.LeftArrow :
+            case ConsoleKey.A:
+            case ConsoleKey.LeftArrow:
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
                 if (page > 1)
                 {
@@ -398,8 +398,8 @@ public class DeckSetting : Scene
                     InventoryPanel();
                 }
                 break;
-            case ConsoleKey.D :
-            case ConsoleKey.RightArrow :
+            case ConsoleKey.D:
+            case ConsoleKey.RightArrow:
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
                 if ((page * 10) < myCard.Count)
                 {
@@ -407,8 +407,8 @@ public class DeckSetting : Scene
                     InventoryPanel();
                 }
                 break;
-            case ConsoleKey.W :
-            case ConsoleKey.UpArrow :
+            case ConsoleKey.W:
+            case ConsoleKey.UpArrow:
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
                 Console.SetCursorPosition(10, (cursor * 2) + 8);
                 Console.WriteLine("  ");
@@ -428,8 +428,8 @@ public class DeckSetting : Scene
                     cursor = 9;
                 }
                 break;
-            case ConsoleKey.S :
-            case ConsoleKey.DownArrow :
+            case ConsoleKey.S:
+            case ConsoleKey.DownArrow:
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Over.wav");
                 Console.SetCursorPosition(10, (cursor * 2) + 8);
                 Console.WriteLine("  ");
@@ -448,7 +448,7 @@ public class DeckSetting : Scene
                     cursor = 0;
                 }
                 break;
-            case ConsoleKey.Tab :
+            case ConsoleKey.Tab:
                 Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
 
                 if (cursor_is_mycard == true)
@@ -469,8 +469,8 @@ public class DeckSetting : Scene
                 Console.SetCursorPosition(118, (cursor * 2) + 8);
                 Console.WriteLine("  ");
                 break;
-            case ConsoleKey.Enter :
-            case ConsoleKey.Spacebar :
+            case ConsoleKey.Enter:
+            case ConsoleKey.Spacebar:
                 if (cursor_is_mycard)
                 {
                     MyDeckAdd();
@@ -480,8 +480,8 @@ public class DeckSetting : Scene
                     CardRemove();
                 }
                 break;
-            case ConsoleKey.Backspace :
-                if(Core.SaveData.Inventory.Count + Core.SaveData.Deck.Count > 10)
+            case ConsoleKey.Backspace:
+                if (Core.SaveData.Inventory.Count + Core.SaveData.Deck.Count > 10)
                 {
                     CardRemove();
                 }
@@ -490,7 +490,23 @@ public class DeckSetting : Scene
                     Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
                 }
                 break;
-            case ConsoleKey.Escape :
+            case ConsoleKey.Q:
+                Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
+                Core.SaveData.Inventory.Sort();
+                myCard.Clear();
+                myDeck.Clear();
+                InitCard();
+                Core.Save();
+                break;
+            case ConsoleKey.E:
+                Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
+                Core.SaveData.Deck.Sort();
+                myDeck.Clear();
+                myCard.Clear();
+                InitCard();
+                Core.Save();
+                break;
+            case ConsoleKey.Escape:
                 Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
                 Core.LoadScene(7);
                 return;
@@ -512,10 +528,10 @@ public class DeckSetting : Scene
 
     void InitCard()
     {
-        string   cardData = Core.GetData(Define.CARD_DATA_PATH);
-        string[] lines    = cardData.Split('\n');//카드가 잘려서 들어감
+        string cardData = Core.GetData(Define.CARD_DATA_PATH);
+        string[] lines = cardData.Split('\n');//카드가 잘려서 들어감
 
-        for(int i = 0; i < Core.SaveData.Inventory.Count; i++)
+        for (int i = 0; i < Core.SaveData.Inventory.Count; i++)
         {
             Card newCard = new Card(i, lines[Core.SaveData.Inventory[i]].Split(','));
             myCard.Add(newCard);
@@ -527,6 +543,8 @@ public class DeckSetting : Scene
             myDeck.Add(newCard);
         }
     }
+
+
 }
 
 struct Card
@@ -538,13 +556,13 @@ struct Card
     public int cost;
     public string info;
 
-    public Card( int Index,string[] data)
+    public Card(int Index, string[] data)
     {
         index = Index;
-        name   = data[0];
-        type   = (CardType)int.Parse(data[1]);
-        power  = int.Parse(data[2]);
-        cost   = int.Parse(data[3]);
+        name = data[0];
+        type = (CardType)int.Parse(data[1]);
+        power = int.Parse(data[2]);
+        cost = int.Parse(data[3]);
         info = data[6];
     }
 }

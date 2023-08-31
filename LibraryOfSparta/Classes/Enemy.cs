@@ -3,7 +3,6 @@ using LibraryOfSparta.Managers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace LibraryOfSparta.Classes
 {
@@ -100,6 +99,8 @@ namespace LibraryOfSparta.Classes
             Spd = int.Parse(skill[4]);
 
             patternQueue.Enqueue(patternIndex);
+
+            Core.PlaySFX(Define.SFX_PATH + CurrentSkill.SFXBefore);
         }
 
         public void CastPattern(Player player)
@@ -108,7 +109,7 @@ namespace LibraryOfSparta.Classes
 
             switch (CurrentSkill.Type)
             {
-                case PatternType.NON_EMOTION_PLAYER_TARGET:
+                case PatternType.감정토큰없는플레이어공격:
                     if (player.OnHit(CurrentSkill.Power) == true)
                     {
                         if (CurrentSkill.Buffs != null)
@@ -121,7 +122,7 @@ namespace LibraryOfSparta.Classes
                     }
                     player.UpdatePlayerUI();
                     break;
-                case PatternType.PLAYER_TARGET:
+                case PatternType.플레이어공격:
                     if(player.OnHit(CurrentSkill.Power) == true)
                     {
                         if (CurrentSkill.Buffs != null)
@@ -131,9 +132,26 @@ namespace LibraryOfSparta.Classes
                                 player.AddDebuff(buff);
                             }
                         }
-                        ((Battle)Core.CurrentScene).AddToken(false);
                         dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", CurrentSkill.Name, CurrentSkill.Power, BattleSitulation.ATK);
                     }
+                    ((Battle)Core.CurrentScene).AddToken(false, 1);
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.감정토큰없는플레이어버프:
+                    if (player.OnHit(CurrentSkill.Power) == true)
+                    {
+                        if (CurrentSkill.Buffs != null)
+                        {
+                            foreach (int buff in CurrentSkill.Buffs)
+                            {
+                                player.AddBuff(buff);
+                            }
+                        }
+                    }
+                    break;
+                case PatternType.자폭:
+                    player.OnHit(CurrentSkill.Power);
+                    Hp = 0;
                     player.UpdatePlayerUI();
                     break;
             }
