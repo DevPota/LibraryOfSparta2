@@ -179,7 +179,7 @@ namespace LibraryOfSparta.Classes
 
                 Player.Token += value;
 
-                if (Player.Token == 5)
+                if (Player.Token >= 5)
                 {
                     Player.Token = 0;
                     Player.Emotion++;
@@ -203,7 +203,7 @@ namespace LibraryOfSparta.Classes
 
                 Enemy.Token += value;
 
-                if (Enemy.Token == 5)
+                if (Enemy.Token >= 5)
                 {
                     Enemy.Token = 0;
                     Enemy.Emotion++;
