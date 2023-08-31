@@ -468,7 +468,7 @@ namespace LibraryOfSparta.Classes
             Console.Write(blank);
             Console.SetCursorPosition(x, y + 3);
 
-            int defBuffValue = player.GetDef(false);
+            int defBuffValue = player.GetDefBuffValue();
             Console.Write("⛨ 방어 : {0} + {1} + {2} ({3})", player.Def, player.Emotion, defBuffValue, player.Def + player.Emotion + defBuffValue);
             Console.SetCursorPosition(x, y + 4);
             Console.Write(blank);
@@ -486,6 +486,7 @@ namespace LibraryOfSparta.Classes
             int buffY = 36;
 
             string blank = "             ";
+            string doubleBlank = "                          ";
 
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.SetCursorPosition(buffX, buffY);
@@ -522,7 +523,7 @@ namespace LibraryOfSparta.Classes
             for (int i = 0; i < 10; i++)
             {
                 Console.SetCursorPosition(debuffX, (debuffY + 2) + i);
-                Console.Write(blank);
+                Console.Write(doubleBlank);
             }
 
             for (int i = 0; i < debuffList.Count; i++)

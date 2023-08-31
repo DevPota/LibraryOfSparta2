@@ -119,10 +119,13 @@ namespace LibraryOfSparta.Classes
 
             switch(CurrentSkill.Type)
             {
+                case PatternType.재사용하지않고플레이어공격:
+                case PatternType.재사용하지않고플레이어공격디버프:
                 case PatternType.재사용하지않고플레이어버프감정토큰없음:
                 case PatternType.재사용하지않고플레이어디버프감정토큰없음:
                 case PatternType.재사용하지않고플레이어버프다날리고버프감정토큰없음:
                 case PatternType.재사용하지않고플레이어디버프다날리고디버프감정토큰없음:
+                case PatternType.오프닝:
                     break;
                 default:
                     patternQueue.Enqueue(patternIndex);
@@ -283,6 +286,53 @@ namespace LibraryOfSparta.Classes
                     break;
                 case PatternType.플레이어모든버프삭제_해제불가_포함:
                     player.BuffList = new List<int>();
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.레스터라이즈:
+                    int mulCount = 1;
+                    string[] pBuffDataLines = Core.GetData(Define.P_BUFF_DATA_PATH).Split('\n');
+                    foreach(int buffIndex in player.BuffList)
+                    {
+                        string[] pBuffData = pBuffDataLines[buffIndex].Split(',');
+
+                        PlayerBuffType type =  (PlayerBuffType)int.Parse(pBuffData[1]);
+
+                        if(type == PlayerBuffType.픽셀_셰이더_청)
+                        {
+                            mulCount++;   
+                        }
+                    }
+                    player.OnHit(CurrentSkill.Power * mulCount);
+                    dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", CurrentSkill.Name, CurrentSkill.Power * mulCount, BattleSitulation.ATK);
+                    ((Battle)Core.CurrentScene).AddToken(false, 1);
+                    player.UpdatePlayerUI();
+                    break;
+                    case PatternType.재사용하지않고플레이어공격 :
+                    if (player.OnHit(CurrentSkill.Power) == true)
+                    {
+                        dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", CurrentSkill.Name, CurrentSkill.Power, BattleSitulation.ATK);
+                    }
+                    ((Battle)Core.CurrentScene).AddToken(false, 1);
+                    player.UpdatePlayerUI();
+                    break;
+                    case PatternType.플레이어모든디버프삭제_해제불가_포함 :
+                    player.DebuffList = new List<int>();
+                    break;
+                    case PatternType.오프닝:
+                    break;
+                    case PatternType.재사용하지않고플레이어공격디버프:
+                    if (player.OnHit(CurrentSkill.Power) == true)
+                    {
+                        if (CurrentSkill.Buffs != null)
+                        {
+                            foreach (int buff in CurrentSkill.Buffs)
+                            {
+                                player.AddDebuff(buff);
+                            }
+                        }
+                        dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", CurrentSkill.Name, CurrentSkill.Power, BattleSitulation.ATK);
+                    }
+                    ((Battle)Core.CurrentScene).AddToken(false, 1);
                     player.UpdatePlayerUI();
                     break;
             }

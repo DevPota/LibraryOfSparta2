@@ -1,5 +1,6 @@
 ﻿using LibraryOfSparta.Common;
 using LibraryOfSparta.Managers;
+using System.Diagnostics;
 
 namespace LibraryOfSparta.Classes
 {
@@ -76,12 +77,9 @@ namespace LibraryOfSparta.Classes
             string pBuffData = Core.GetData(Define.P_BUFF_DATA_PATH);
             string[] lines = pBuffData.Split('\n');
 
-            Queue<int> queue = new Queue<int>(BuffList);
-            Queue<int> Debuffqueue = new Queue<int>(DebuffList);
-
             for (int i = 0; i < BuffList.Count; i++)
             {
-                int element = queue.Dequeue();
+                int element = BuffList[i];
                 string[] buffData = lines[element].Split(',');
                 PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
 
@@ -90,26 +88,18 @@ namespace LibraryOfSparta.Classes
                     str += int.Parse(buffData[2]);
 
                 }
-                else
-                {
-                    queue.Enqueue(element);
-                }
             }
 
             for (int i = 0; i < DebuffList.Count; i++)
             {
-                int element = Debuffqueue.Dequeue();
+                int element = DebuffList[i];
                 string[] buffData = lines[element].Split(',');
                 PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
 
-                if (type == PlayerBuffType.힘_디버프)
+                if (type == PlayerBuffType.힘_디버프 || type == PlayerBuffType.해제불가_힘_디버프)
                 {
                     str -= int.Parse(buffData[2]);
 
-                }
-                else
-                {
-                    Debuffqueue.Enqueue(element);
                 }
             }
 
@@ -153,11 +143,11 @@ namespace LibraryOfSparta.Classes
                 string[] buffData = lines[element].Split(',');
                 PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
 
-                if (type == PlayerBuffType.힘_디버프)
+                if (type == PlayerBuffType.힘_디버프 || type == PlayerBuffType.해제불가_힘_디버프)
                 {
                     str -= int.Parse(buffData[2]);
 
-                    if (erase == false)
+                    if (erase == false || type == PlayerBuffType.해제불가_힘_디버프)
                     {
                         Debuffqueue.Enqueue(element);
                     }
@@ -174,6 +164,40 @@ namespace LibraryOfSparta.Classes
             return str;
         }
 
+        public int GetDefBuffValue()
+        {
+            int def = 0;
+
+            string pBuffData = Core.GetData(Define.P_BUFF_DATA_PATH);
+            string[] lines = pBuffData.Split('\n');
+
+            for (int i = 0; i < BuffList.Count; i++)
+            {
+                int element = BuffList[i];
+                string[] buffData = lines[element].Split(',');
+                PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
+
+                if (type == PlayerBuffType.방어 || type == PlayerBuffType.반격)
+                {
+                    def += int.Parse(buffData[2]);
+                }
+            }
+
+            for (int i = 0; i < DebuffList.Count; i++)
+            {
+                int element = DebuffList[i];
+                string[] buffData = lines[element].Split(',');
+                PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
+
+                if (type == PlayerBuffType.해제불가_방어_디버프)
+                {
+                    def -= int.Parse(buffData[2]);
+                }
+            }
+
+            return def;
+        }
+
         public int GetDef(bool erase)
         {
             int def = Def;
@@ -182,8 +206,9 @@ namespace LibraryOfSparta.Classes
             string[] lines = pBuffData.Split('\n');
 
             Queue<int> queue = new Queue<int>(BuffList);
+            Queue<int> Debuffqueue = new Queue<int>(DebuffList);
 
-            for(int i = 0; i < BuffList.Count; i++)
+            for (int i = 0; i < BuffList.Count; i++)
             {
                 int element = queue.Dequeue();
                 string[] buffData = lines[element].Split(',');
@@ -209,7 +234,29 @@ namespace LibraryOfSparta.Classes
                 }
             }
 
+            for (int i = 0; i < DebuffList.Count; i++)
+            {
+                int element = Debuffqueue.Dequeue();
+                string[] buffData = lines[element].Split(',');
+                PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
+
+                if (type == PlayerBuffType.해제불가_방어_디버프)
+                {
+                    def -= int.Parse(buffData[2]);
+
+                    if (erase == false || type == PlayerBuffType.해제불가_방어_디버프)
+                    {
+                        Debuffqueue.Enqueue(element);
+                    }
+                }
+                else
+                {
+                    Debuffqueue.Enqueue(element);
+                }
+            }
+
             BuffList = new List<int>(queue);
+            DebuffList = new List<int>(Debuffqueue);
 
             return def;
         }
@@ -284,6 +331,14 @@ namespace LibraryOfSparta.Classes
                 
                 if (defValue != 0)
                 {
+                    if(defValue < 0)
+                    {
+                        Hp += defValue - damage;
+                        dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", "", defValue + damage, BattleSitulation.ATK);
+                        UpdatePlayerUI();
+                        return true;
+                    }
+
                     if(counter == true)
                     {
                         counter = false;
@@ -373,20 +428,50 @@ namespace LibraryOfSparta.Classes
                     switch(cardType)
                     {
                         case CardType.공격 :
+                            if (CheckMark(PlayerBuffType.공격_표식) == true)
+                            {
+                                Core.PlaySFX(Define.SFX_PATH + "/Hokma_Defeat.wav");
+                                UpdatePlayerUI();
+                                return;
+                            }
                             ((Battle)Core.CurrentScene).AddToken(true, 1);
                             dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power + GetStr(false), BattleSitulation.ATK);
                             enemy.OnHit(power + GetStr(true));
                             break;
                         case CardType.공격_자가버프:
+                            if (CheckMark(PlayerBuffType.공격_표식) == true)
+                            {
+                                Core.PlaySFX(Define.SFX_PATH + "/Hokma_Defeat.wav");
+                                UpdatePlayerUI();
+                                return;
+                            }
+
                             ((Battle)Core.CurrentScene).AddToken(true, 1);
                             dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power + GetStr(false), BattleSitulation.ATK);
                             enemy.OnHit(power + GetStr(true));
                             
                             if(buffs != null)
                             {
-                                foreach(Buff buff in buffs)
+                                string[] lines = Core.GetData(Define.P_BUFF_DATA_PATH).Split('\n');
+                                List<PlayerBuffType> buffTypes = new List<PlayerBuffType>();
+                                foreach (Buff buff in buffs)
                                 {
+                                    PlayerBuffType type = (PlayerBuffType)int.Parse(lines[buff.BuffIndex].Split(',')[1]);
+                                    buffTypes.Add(type);
                                     AddBuff(buff.BuffIndex);
+                                }
+
+                                foreach (PlayerBuffType type in buffTypes)
+                                {
+                                    if (type == PlayerBuffType.방어)
+                                    {
+                                        if (CheckMark(PlayerBuffType.방어_표식) == true)
+                                        {
+                                            Core.PlaySFX(Define.SFX_PATH + "/Hokma_Defeat.wav");
+                                            UpdatePlayerUI();
+                                            return;
+                                        }
+                                    }
                                 }
                             }
                             break;
@@ -394,13 +479,37 @@ namespace LibraryOfSparta.Classes
                         case CardType.방어:
                             if (buffs != null)
                             {
+                                string[] lines = Core.GetData(Define.P_BUFF_DATA_PATH).Split('\n');
+                                List<PlayerBuffType> buffTypes = new List<PlayerBuffType>();
                                 foreach (Buff buff in buffs)
                                 {
+                                    PlayerBuffType type = (PlayerBuffType)int.Parse(lines[buff.BuffIndex].Split(',')[1]);
+                                    buffTypes.Add(type);
                                     AddBuff(buff.BuffIndex);
+                                }
+
+                                foreach(PlayerBuffType type in buffTypes)
+                                {
+                                    if(type == PlayerBuffType.방어)
+                                    {
+                                        if (CheckMark(PlayerBuffType.방어_표식) == true)
+                                        {
+                                            Core.PlaySFX(Define.SFX_PATH + "/Hokma_Defeat.wav");
+                                            UpdatePlayerUI();
+                                            return;
+                                        }
+                                    }
                                 }
                             }
                             break;
                         case CardType.회복:
+                            if(CheckMark(PlayerBuffType.회복_표식) == true)
+                            {
+                                Core.PlaySFX(Define.SFX_PATH + "/Hokma_Defeat.wav");
+                                UpdatePlayerUI();
+                                return;
+                            }
+
                             if (buffs != null)
                             {
                                 foreach (Buff buff in buffs)
@@ -540,6 +649,43 @@ namespace LibraryOfSparta.Classes
             PlayerHands.RemoveAt(index);
 
             drawListener(PlayerHands, this);
+        }
+
+        public bool CheckMark(PlayerBuffType type)
+        {
+            string[] buffDataLines = Core.GetData(Define.P_BUFF_DATA_PATH).Split('\n');
+
+            Queue<int> debuffQueue = new Queue<int>();
+
+            int damage = 0;
+
+            foreach(int debuffIndex in DebuffList)
+            {
+                string[] debuffData = buffDataLines[debuffIndex].Split(',');
+                PlayerBuffType debuffType = (PlayerBuffType)int.Parse(debuffData[1]);
+                int debuffDamage = int.Parse(debuffData[2]);
+
+                if(type == debuffType)
+                {
+                    damage += debuffDamage;
+                }
+                else
+                {
+                    debuffQueue.Enqueue(debuffIndex);
+                }
+            }
+
+            DebuffList = new List<int>(debuffQueue);
+
+            if(damage != 0)
+            {
+                OnHit(damage);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void InitDeck()
