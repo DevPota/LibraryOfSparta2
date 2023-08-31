@@ -27,6 +27,8 @@ namespace LibraryOfSparta.Classes
         LogoAnimation teammate3_anim = null;
         Logo teammate4 = null;
         LogoAnimation teammate4_anim = null;
+        Logo teammate5 = null;
+        LogoAnimation teammate5_anim = null;
         int portrait_cursor;
         //팀원 역할
         Logo role_1 = null;
@@ -37,6 +39,8 @@ namespace LibraryOfSparta.Classes
         LogoAnimation role_3_anim = null;
         Logo role_4 = null;
         LogoAnimation role_4_anim = null;
+        Logo role_5 = null;
+        LogoAnimation role_5_anim = null;
         int role_cursor;
 
         List<LogoAnimation> portrait;
@@ -83,11 +87,14 @@ namespace LibraryOfSparta.Classes
             teammate3_anim = new LogoAnimation(teammate3);
             teammate4 = new Logo(5, 12, "img_GyungHyunLee");
             teammate4_anim = new LogoAnimation(teammate4);
+            teammate5 = new Logo(85, 15, "img_SaeJinKim");
+            teammate5_anim = new LogoAnimation(teammate5);
 
             portrait.Add(teammate1_anim);
             portrait.Add(teammate2_anim);
             portrait.Add(teammate3_anim);
             portrait.Add(teammate4_anim);
+            portrait.Add(teammate5_anim);
 
             //팀원 역할
             role_1 = new Logo(1, 10, "img_HaeChanKim_Role");
@@ -98,11 +105,14 @@ namespace LibraryOfSparta.Classes
             role_3_anim = new LogoAnimation(role_3);
             role_4 = new Logo(80, 10, "img_GyungHyunLee_Role");
             role_4_anim = new LogoAnimation(role_4);
+            role_5 = new Logo(5, 10, "img_SaeJinKim_Role");
+            role_5_anim = new LogoAnimation(role_5);
 
             role.Add(role_1_anim);
             role.Add(role_2_anim);
             role.Add(role_3_anim);
             role.Add(role_4_anim);
+            role.Add(role_5_anim);
 
 
             skipstack = 0;
@@ -118,6 +128,7 @@ namespace LibraryOfSparta.Classes
                 portrait_cursor = portrait_cursor + 1;
                 
             }
+            //애니메이션 다 끝나면 타이틀 화면으로
             if (!(portrait_cursor < portrait.Count))
             {
                 Console.Clear();
@@ -126,7 +137,7 @@ namespace LibraryOfSparta.Classes
                 return;
             }
 
-                if (portrait_cursor % 2 == 0) portrait[portrait_cursor].CreditImgRight();
+            if (portrait_cursor % 2 == 0) portrait[portrait_cursor].CreditImgRight();
             else portrait[portrait_cursor].CreditImgLeft();
 
             if (role[role_cursor].isEnd)

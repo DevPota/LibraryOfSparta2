@@ -403,7 +403,7 @@ namespace LibraryOfSparta
                             else
                             {
                                 Core.PlaySFX(Define.SFX_PATH + "/BookSound.wav");
-                                Core.LoadScene(3);
+                                Core.LoadScene(12);
                                 return;
                             }
                         }

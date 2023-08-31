@@ -66,6 +66,10 @@ namespace LibraryOfSparta.Classes
         {
             // 버프, 디버프 계산 나중에 추가
             Hp -= damage;
+            if(Hp > MaxHp)
+            {
+                Hp = MaxHp;
+            }
             hpListener(Hp, MaxHp);
         }
 
@@ -98,7 +102,17 @@ namespace LibraryOfSparta.Classes
 
             Spd = int.Parse(skill[4]);
 
-            patternQueue.Enqueue(patternIndex);
+            switch(CurrentSkill.Type)
+            {
+                case PatternType.재사용하지않고플레이어버프감정토큰없음:
+                case PatternType.재사용하지않고플레이어디버프감정토큰없음:
+                case PatternType.재사용하지않고플레이어버프다날리고버프감정토큰없음:
+                case PatternType.재사용하지않고플레이어디버프다날리고디버프감정토큰없음:
+                    break;
+                default:
+                    patternQueue.Enqueue(patternIndex);
+                    break;
+            }
 
             Core.PlaySFX(Define.SFX_PATH + CurrentSkill.SFXBefore);
         }
@@ -138,20 +152,88 @@ namespace LibraryOfSparta.Classes
                     player.UpdatePlayerUI();
                     break;
                 case PatternType.감정토큰없는플레이어버프:
+                    if (CurrentSkill.Buffs != null)
+                    {
+                        foreach (int buff in CurrentSkill.Buffs)
+                        {
+                            player.AddBuff(buff);
+                        }
+                    }
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.자폭:
+                    player.OnHit(CurrentSkill.Power);
+                    Hp = 0;
+                    player.UpdatePlayerUI();
+                    return;
+                case PatternType.감정토큰없는디버프부여:
+                    if (CurrentSkill.Buffs != null)
+                    {
+                        foreach (int buff in CurrentSkill.Buffs)
+                        {
+                            player.AddDebuff(buff);
+                        }
+                    }
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.재사용하지않고플레이어버프감정토큰없음:
+                    if (CurrentSkill.Buffs != null)
+                    {
+                        foreach (int buff in CurrentSkill.Buffs)
+                        {
+                            player.AddBuff(buff);
+                        }
+                    }
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.재사용하지않고플레이어디버프감정토큰없음:
+                    if (CurrentSkill.Buffs != null)
+                    {
+                        foreach (int buff in CurrentSkill.Buffs)
+                        {
+                            player.AddDebuff(buff);
+                        }
+                    }
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.회복:
+                    OnHit(-CurrentSkill.Power);
+                    dialogListener(((Battle)Core.CurrentScene).floorData[1],"", "", CurrentSkill.Power, BattleSitulation.HEAL);
+                    break;
+                case PatternType.감정토큰없는다이얼로그있는플레이어공격:
                     if (player.OnHit(CurrentSkill.Power) == true)
                     {
                         if (CurrentSkill.Buffs != null)
                         {
                             foreach (int buff in CurrentSkill.Buffs)
                             {
-                                player.AddBuff(buff);
+                                player.AddDebuff(buff);
                             }
                         }
+                        dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", CurrentSkill.Name, CurrentSkill.Power, BattleSitulation.ATK);
                     }
+                    player.UpdatePlayerUI();
                     break;
-                case PatternType.자폭:
-                    player.OnHit(CurrentSkill.Power);
-                    Hp = 0;
+                case PatternType.재사용하지않고플레이어버프다날리고버프감정토큰없음:
+                    if (CurrentSkill.Buffs != null)
+                    {
+                        player.BuffList = new List<int>();
+                        foreach (int buff in CurrentSkill.Buffs)
+                        {
+                            player.AddBuff(buff);
+                        }
+                    }
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.재사용하지않고플레이어디버프다날리고디버프감정토큰없음:
+                    if (CurrentSkill.Buffs != null)
+                    {
+                        player.DebuffList = new List<int>();
+                        foreach (int buff in CurrentSkill.Buffs)
+                        {
+                            player.AddDebuff(buff);
+                        }
+                    }
                     player.UpdatePlayerUI();
                     break;
             }

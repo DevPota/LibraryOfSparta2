@@ -1,4 +1,5 @@
 ﻿using LibraryOfSparta.Common;
+using LibraryOfSparta.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace LibraryOfSparta.Classes
     {
         public string imgName;
         string img;
-        string[] lines;
+        public string[] lines;
         public int x, y;
         public int width, height;
 
@@ -130,6 +131,8 @@ namespace LibraryOfSparta.Classes
 
 
         //급하게 만든것 쓰지말것
+
+        //타이틀 메뉴
         public void RightClear()
         {
             for (int j = logo.y; j < logo.y + logo.height; j++)
@@ -253,7 +256,7 @@ namespace LibraryOfSparta.Classes
 
             Console.SetCursorPosition(0, 0);
         }
-
+        //크레딧이미지
         public void CreditImgRight()
         {
             if (frame < 5) MoveLeft(1, ConsoleColor.DarkGray);
@@ -282,6 +285,180 @@ namespace LibraryOfSparta.Classes
                 isEnd = true;
             }
         }
+        //보스등장
+        public void SmokeDirectDown()
+        {
+            if (frame+3 < logo.height)
+            {
+                Console.SetCursorPosition(logo.x, logo.y + frame);
+                Console.Write(logo.lines[frame]);
+                Console.SetCursorPosition(logo.x, logo.y + frame+1);
+                Console.Write(logo.lines[frame+1]);
+                Console.SetCursorPosition(logo.x, logo.y + frame+2);
+                Console.Write(logo.lines[frame + 2]);
+            }
+            if (frame - 6 >= 0 && frame - 6 < logo.height) 
+            {
+                string blank = "";
+                for (int i = 0; i < logo.width; i++)
+                {
+                    blank += " ";
+                }
+                
+                Console.SetCursorPosition(logo.x, logo.y + frame - 6);
+                Console.Write(blank);
+                Console.SetCursorPosition(logo.x, logo.y + frame+1 - 6);
+                Console.Write(blank);
+                Console.SetCursorPosition(logo.x, logo.y + frame+2 - 6);
+                Console.Write(blank);
+
+            }
+            if (frame - 6 >= logo.height)
+            {
+                frame = 0;
+                isEnd = true;
+            }
+            else frame+=3;
+        }
+        public void SmokeDirectUp()
+        {
+            if (frame < logo.height && logo.y + logo.height - 1 - frame - 2 >= 0)
+            {
+                Console.SetCursorPosition(logo.x, logo.y + logo.height -1 - frame);
+                Console.Write(logo.lines[logo.height - 1 - frame]);
+                Console.SetCursorPosition(logo.x, logo.y + logo.height - 1 - frame-1);
+                Console.Write(logo.lines[logo.height - 1 - frame-1]);
+                Console.SetCursorPosition(logo.x, logo.y + logo.height - 1 - frame - 2);
+                Console.Write(logo.lines[logo.height - 1 - frame - 2]);
+            }
+            if (frame - 6 >= 0 && frame - 6 < logo.height)
+            {
+                string blank = "";
+                for (int i = 0; i < logo.width; i++)
+                {
+                    blank += " ";
+                }
+
+                Console.SetCursorPosition(logo.x, logo.y + logo.height-1 - frame + 6);
+                Console.Write(blank);
+                Console.SetCursorPosition(logo.x, logo.y + logo.height - 1 - frame-1 + 6);
+                Console.Write(blank);
+                Console.SetCursorPosition(logo.x, logo.y + logo.height - 1 - frame-2 + 6);
+                Console.Write(blank);
+
+            }
+            if (frame - 6 >= logo.height)
+            {
+                frame = 0;
+                isEnd = true;
+            }
+            else frame+=3;
+        }
+        public void blinkRed()
+        {
+            if (frame % 2 == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                logo.Draw();
+                Console.ResetColor();
+            }
+            else
+            {
+                logo.Draw();
+            }
+
+            if (frame > 5)
+            {
+                isEnd = true;
+                frame = 0;
+                return;
+            }
+            else frame++;
+
+        }
+        public void Relocation(int x, int y)
+        {
+            this.logo.x = x;
+            this.logo.y = y;
+        }
+
+        //체크무늬
+        public void check(int paternx)
+        {
+            int f = frame / 2;
+
+            if (frame % 2 == 0)
+            {
+                if (f * paternx < logo.width / 2)
+                {
+                    for (int i = 0; i < logo.height; i++)
+                    {
+                        Console.SetCursorPosition(logo.x + f * paternx, logo.y + i);
+                        Console.Write(logo.lines[i].Substring(f * paternx, paternx));
+                    }
+                }
+                else isEnd = true;
+
+                if (f * paternx < logo.width / 2)
+                {
+                    for (int i = 0; i < logo.height; i++)
+                    {
+                        Console.SetCursorPosition(logo.x + logo.width - 1 - (f + 1) * paternx, logo.y + i);
+                        Console.Write(logo.lines[i].Substring(f * paternx, paternx));
+                    }
+                }
+                else
+                {
+                    isEnd = true;
+                    frame = 0;
+                    return;
+                }
+            }
+
+
+            frame++;
+        }
+        public void blink()
+        {
+            if (frame % 2 == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                logo.Draw();
+                Console.ResetColor();
+            }
+            else
+            {
+                logo.Draw();
+            }
+
+            if(frame > 5)
+            {
+                isEnd = true;
+                frame = 0;
+                return;
+            }
+
+            frame++;
+        }
+        //언락
+        public void unlock()
+        {
+            ChangeColor(ConsoleColor.Yellow);
+            if (frame > 5) isEnd = true;
+        }
+        //인트로
+        public void Fade()
+        {
+            if (frame < 5) Draw(ConsoleColor.DarkGray);
+            else if (frame < 10) Draw(ConsoleColor.Gray);
+            else if (frame < 20) Draw(ConsoleColor.White);
+            else if (frame < 25) Draw(ConsoleColor.Gray);
+            else if (frame < 30) Draw(ConsoleColor.DarkGray);
+            else if (frame == 30) { Clear(); frame = 0; isEnd = true; }
+            else frame++;
+        }
+
+
 
 
         //애니메이션 끝

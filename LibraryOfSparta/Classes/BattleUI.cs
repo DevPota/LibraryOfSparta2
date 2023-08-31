@@ -14,7 +14,8 @@ namespace LibraryOfSparta.Classes
         VICTORY,
         DEFEAT,
         EVADE,
-        DEF
+        DEF,
+        HEAL
     }
 
     public class BattleUI
@@ -404,7 +405,7 @@ namespace LibraryOfSparta.Classes
                     Console.SetCursorPosition(x, y + 1);
                     Console.Write(blank);
                     Console.SetCursorPosition(x, y + 1);
-                    Console.Write("{0}는 {1} 대미지를 받았다!", target, power);
+                    Console.Write("{0}(은)는 {1} 대미지를 받았다!", target, power);
                     break;
                 case BattleSitulation.BUFF:
                     Console.ForegroundColor = ConsoleColor.Blue;
@@ -421,6 +422,12 @@ namespace LibraryOfSparta.Classes
                 case BattleSitulation.DEF:
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.Write("공격을 막아 {0} 대미지를 받았다!", power);
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write(blank);
+                    break;
+                case BattleSitulation.HEAL:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("{0}(은)는 {1} 회복했다!", caster, power);
                     Console.SetCursorPosition(x, y + 1);
                     Console.Write(blank);
                     break;

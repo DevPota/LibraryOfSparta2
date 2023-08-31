@@ -12,6 +12,13 @@ namespace LibraryOfSparta.Classes
         LogoAnimation animation  = null;
         LogoAnimation animation2 = null;
         LogoAnimation animation3 = null;
+        LogoAnimation animation4 = null;
+        LogoAnimation animation5 = null;
+        LogoAnimation animation6 = null;
+        LogoAnimation animation7 = null;
+        LogoAnimation animation8 = null;
+        LogoAnimation animation9 = null;
+
 
         BorderCursor Bcursor;
         int Icursor;
@@ -58,15 +65,36 @@ namespace LibraryOfSparta.Classes
 
             //페이드인아웃 애니메이션
             AnimationCursor = 0;
-            Logo Keter = new Logo(60, 20, "img_Keter2");
-            Logo Malkuth = new Logo(25, 20, "img_Malkuth");
+            Logo Keter = new Logo(60, 20, "title_Keter2");
+            Logo Malkuth = new Logo(25, 20, "title_Malkuth");
+            Logo Binah = new Logo(60, 20, "title_Binah");
+            Logo Chesed = new Logo(25, 20, "title_Chesed");
+            Logo Gebura = new Logo(60, 20, "title_Gebura");
+            Logo Hod = new Logo(25, 20, "title_Hod");
+            Logo Hokma = new Logo(60, 20, "title_Hokma");
+            Logo Netzach = new Logo(25, 20, "title_Netzach");
+            Logo Yesod = new Logo(60, 20, "title_Yesod");
 
             animation = new LogoAnimation(Keter);
             animation2 = new LogoAnimation(Malkuth);
+            animation3 = new LogoAnimation(Binah);
+            animation4 = new LogoAnimation(Chesed);
+            animation5 = new LogoAnimation(Gebura);
+            animation6 = new LogoAnimation(Hod);
+            animation7 = new LogoAnimation(Hokma);
+            animation8 = new LogoAnimation(Netzach);
+            animation9 = new LogoAnimation(Yesod);
 
             AnimationList = new List<LogoAnimation>(); 
             AnimationList.Add(animation);
             AnimationList.Add(animation2);
+            AnimationList.Add(animation3);
+            AnimationList.Add(animation4);
+            AnimationList.Add(animation5);
+            AnimationList.Add(animation6);
+            AnimationList.Add(animation7);
+            AnimationList.Add(animation8);
+            AnimationList.Add(animation9);
 
             Console.ResetColor();
 
