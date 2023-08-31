@@ -3,7 +3,7 @@ TIL,0,4,3,10,-1,/Malkuth_0.wav
 작성하셨나요?,5,1,-1,15,-1,/Malkuth_1.wav
 여러분 잘들리시나요?,10,1,-1,20,-1,/Malkuth_2.wav
 음악을 바꿔보죠,0,1,-1,10,/Yesod_0.wav,-1
-이건 어떻습니까?,10,2,8,30,/Yesod_1.wav,/YesodSpecial.wav
+이건 어떻습니까?,10,10,8,30,/Yesod_1.wav,/YesodSpecial.wav
 반갑군,15,1,-1,30,/Yesod_2.wav,/FingerTip.wav
 또 와라,100,3,-1,40,/Yesod_3.wav,/YesodSpecial2.wav
 Git Init,0,10,-1,30,/Hod_0.wav,-1
