@@ -306,8 +306,9 @@ namespace LibraryOfSparta.Managers
                     ((DeckSetting)CurrentScene).Init();
                     break;
                 case 3:
+                    PlaySFX(Define.SFX_PATH +"/BattleStart.wav");
                     Scene temp = new Battle();
-                    ((Battle)temp).Initbattle(((Entrance)CurrentScene).CursorIndex);
+                    ((Battle)temp).Initbattle(((BattleIntro)CurrentScene).cursorIndex);
                     CurrentScene = temp;
                     break;
                 case 4:
@@ -320,6 +321,9 @@ namespace LibraryOfSparta.Managers
                     ((Credit)CurrentScene).Init();
                     break;
                 case 6:
+                    Scene battleTemp3 = CurrentScene;
+                    CurrentScene = new VictoryCutScene();
+                    ((VictoryCutScene)CurrentScene).Init(((Battle)battleTemp3).GetEnemyEmotionLevel(), ((Battle)battleTemp3).Floor);
                     break;
                 case 7:
                     SceneIndex = 1;
@@ -338,6 +342,23 @@ namespace LibraryOfSparta.Managers
                     Scene battleTemp2 = CurrentScene;
                     CurrentScene = new Result();
                     ((Result)CurrentScene).Init(-1, ((Battle)battleTemp2).Floor);
+                    break;
+                case 10:
+                    SceneIndex = 4;
+                    Scene victoryAnim = CurrentScene;
+                    CurrentScene = new Result();
+                    ((Result)CurrentScene).Init(((VictoryCutScene)victoryAnim).Level, ((VictoryCutScene)victoryAnim).Floor);
+                    break;
+                case 11:
+                    CurrentScene = new Intro();
+                    ((Intro)CurrentScene).Init();
+                    break;
+                case 12:
+                    StopPlayerBGM();
+                    PlaySFX(Define.SFX_PATH + "/GetReady.wav");
+                    Scene entranceTemp = CurrentScene;
+                    CurrentScene = new BattleIntro(((Entrance)entranceTemp).CursorIndex);
+                    ((BattleIntro)CurrentScene).Init();
                     break;
 
             }

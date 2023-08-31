@@ -286,12 +286,12 @@ namespace LibraryOfSparta.Classes
                     {
                         case CardType.공격 :
                             ((Battle)Core.CurrentScene).AddToken(true, 1);
-                            dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power + GetStr(true), BattleSitulation.ATK);
+                            dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power + GetStr(false), BattleSitulation.ATK);
                             enemy.OnHit(power + GetStr(true));
                             break;
                         case CardType.공격_자가버프:
                             ((Battle)Core.CurrentScene).AddToken(true, 1);
-                            dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power + GetStr(true), BattleSitulation.ATK);
+                            dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power + GetStr(false), BattleSitulation.ATK);
                             enemy.OnHit(power + GetStr(true));
                             
                             if(buffs != null)
@@ -312,6 +312,22 @@ namespace LibraryOfSparta.Classes
                                 }
                             }
                             break;
+                        case CardType.회복:
+                            if (buffs != null)
+                            {
+                                foreach (Buff buff in buffs)
+                                {
+                                    AddBuff(buff.BuffIndex);
+                                }
+                            }
+                            dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power, BattleSitulation.HEAL);
+                            Hp += power;
+                            if(Hp > MaxHp)
+                            {
+                                Hp = MaxHp;
+                            }
+                            hpListener(Hp, MaxHp);
+                            break;
                     }
                 }
                 else
@@ -328,6 +344,7 @@ namespace LibraryOfSparta.Classes
             hpListener(Hp, MaxHp);
             statusListner(this);
             buffListener(BuffList, DebuffList, buffData);
+            drawListener(PlayerHands, this);
         }
 
         public void AddBuff(int buffIndex)
@@ -343,22 +360,45 @@ namespace LibraryOfSparta.Classes
                 case PlayerBuffType.드로우 :
                     for(int i = 0; i < power; i++)
                     {
-                        AddCardToHand();
+                        if (PlayerHands.Count >= 4)
+                        {
+                            RemoveCardFromHand(0);
+                            AddCardToHand();
+                        }
+                        else
+                        {
+                            AddCardToHand();
+                        }
                     }
+                    UpdatePlayerUI();
                     break;
                 case PlayerBuffType.코스트_회복:
                     for(int i = 0; i < power; i++)
                     {
                         AddCostToPlayer();
                     }
-                    costFillListener(PlayerCost, PlayerCostFilled);
-                    drawListener(PlayerHands, this);
+                    UpdatePlayerUI();
                     break;
                 case PlayerBuffType.감정_레벨_증가:
                     for(int i = 0; i < power; i++)
                     {
                         ((Battle)Core.CurrentScene).AddToken(true, 5);
                     }
+                    UpdatePlayerUI();
+                    break;
+                case PlayerBuffType.카드_버림:
+                    for (int i = 0; i < power; i++)
+                    {
+                        RemoveCardFromHand(i);
+                    }
+                    UpdatePlayerUI();
+                    break;
+                case PlayerBuffType.빛_버림:
+                    for (int i = 0; i < power; i++)
+                    {
+                        PlayerCost--;
+                    }
+                    UpdatePlayerUI();
                     break;
                 default :
                     if (BuffList.Count >= 10)

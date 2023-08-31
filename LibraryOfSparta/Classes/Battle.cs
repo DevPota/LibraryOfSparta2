@@ -169,6 +169,7 @@ namespace LibraryOfSparta.Classes
 
                 if(currentPhase != rules[player.Emotion])
                 {
+                    isPlayerWinning = true;
                     Core.PauseEnemyBGM();
                     Core.PlayPlayerBGM(Define.BGM_PATH + "/" + floorData[2] + "_" + rules[player.Emotion] + ".wav");
                 }
@@ -192,6 +193,7 @@ namespace LibraryOfSparta.Classes
 
                 if (currentPhase != rules[enemy.Emotion])
                 {
+                    isPlayerWinning = false;
                     Core.PausePlayerBGM();
                     Core.PlayEnemyBGM(Define.BGM_PATH + "/" + "Enemy_" + rules[enemy.Emotion] + ".wav");
                 }
@@ -216,9 +218,10 @@ namespace LibraryOfSparta.Classes
             }
             else if(enemy.Hp <= 0)
             {
+                Core.StopPlayerBGM();
                 Core.StopEnemyBGM();
                 Core.PlaySFX(Define.SFX_PATH + "/" + floorData[2] + "_Victory.wav");
-                Core.LoadScene(4);
+                Core.LoadScene(6);
             }
         }
 
