@@ -177,6 +177,12 @@ namespace LibraryOfSparta
             }
             else
             {
+                if(floorIndex == Core.SaveData.CurrentFloor)
+                {
+                    Core.SaveData.CurrentFloor++;
+                    Core.Save();
+                }
+
                 string battleData = Core.GetData(Define.BATTLE_DATA_PATH);
                 string cardData   = Core.GetData(Define.CARD_DATA_PATH);
 

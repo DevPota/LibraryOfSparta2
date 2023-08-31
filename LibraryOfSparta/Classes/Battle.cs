@@ -243,6 +243,11 @@ namespace LibraryOfSparta.Classes
                         Enemy.SetNewPattern("29_30_31_32_33_34_31_34_30_34_33_32_30_34_34_32");
                         break;
                     case 10:
+                        battleUI.DrawEnemy(Define.IMAGE_PATH + "/Img_Keter3.txt");
+                        Core.PlayPlayerBGM(Define.BGM_PATH + "/Keter_3.wav");
+                        Core.PlaySFX(Define.SFX_PATH + "/Gebura2nd.wav");
+                        Core.PlaySFX(Define.SFX_PATH + "/Keter_Victory.wav");
+                        Enemy.SetNewPattern("65_65_68_66_69_69_69_69_70_71_68_75_72_69_69_65_70_68_74_66_68_73_73_70_76_69_69_68_79");
                         break;
                 }
             }
