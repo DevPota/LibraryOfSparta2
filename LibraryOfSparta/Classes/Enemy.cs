@@ -73,6 +73,21 @@ namespace LibraryOfSparta.Classes
             hpListener(Hp, MaxHp);
         }
 
+        public void SetNewPattern(string pattern)
+        {
+            patternQueue = new Queue<int>();
+            enemyFilled = 0;
+
+            string[] patterns = pattern.Split('_');
+
+            foreach (string temp in patterns)
+            {
+                patternQueue.Enqueue(int.Parse(temp));
+            }
+
+            SetPattern();
+        }
+
         public void SetPattern()
         {
             int patternIndex = patternQueue.Dequeue();
@@ -234,6 +249,40 @@ namespace LibraryOfSparta.Classes
                             player.AddDebuff(buff);
                         }
                     }
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.회피및막지못하면손패삭제:
+                    if (player.OnHit(CurrentSkill.Power) == true)
+                    {
+                        if (CurrentSkill.Buffs != null)
+                        {
+                            for (int i = 0; i < CurrentSkill.Buffs.Length; i++)
+                            {
+                                player.RemoveCardFromHand(0);
+                            }
+                        }
+                        dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", CurrentSkill.Name, CurrentSkill.Power, BattleSitulation.ATK);
+                    }
+                    ((Battle)Core.CurrentScene).AddToken(false, 1);
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.회피및막지못하면코스트삭제:
+                    if (player.OnHit(CurrentSkill.Power) == true)
+                    {
+                        if (CurrentSkill.Buffs != null)
+                        {
+                            for (int i = 0; i < CurrentSkill.Buffs.Length; i++)
+                            {
+                                player.PlayerCost--;
+                            }
+                        }
+                        dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", CurrentSkill.Name, CurrentSkill.Power, BattleSitulation.ATK);
+                    }
+                    ((Battle)Core.CurrentScene).AddToken(false, 1);
+                    player.UpdatePlayerUI();
+                    break;
+                case PatternType.플레이어모든버프삭제_해제불가_포함:
+                    player.BuffList = new List<int>();
                     player.UpdatePlayerUI();
                     break;
             }

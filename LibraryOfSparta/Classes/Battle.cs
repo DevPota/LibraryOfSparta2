@@ -5,14 +5,16 @@ namespace LibraryOfSparta.Classes
 {
     public class Battle : Scene
     {
-        Player   player { get; set; } = null;
-        Enemy    enemy { get; set; } = null;
+        public Player   Player { get; private set; } = null;
+        public Enemy    Enemy  { get; private set; } = null;
         BattleUI battleUI { get; set; } = null;
 
         public string[] floorData = null;
         public string[] cardData  = null;
 
         bool isPlayerWinning = true;
+        bool multiPhase = false;
+        bool phaseChanged = false;
 
         public int Floor { get; private set; }
 
@@ -33,7 +35,7 @@ namespace LibraryOfSparta.Classes
             Core.PlayEnemyBGM(Define.BGM_PATH + "/" + "Enemy_0.wav");
             Core.PauseEnemyBGM();
 
-            enemy  = new Enemy
+            Enemy = new Enemy
                 (int.Parse(floorData[4]), 
                 int.Parse(floorData[4]), 
                 floorData[3], 
@@ -41,7 +43,7 @@ namespace LibraryOfSparta.Classes
                 battleUI.RenderEnemyATBBar, 
                 battleUI.RenderBattleDialog);
 
-            player = new Player
+            Player = new Player
                 (battleUI.RenderPlayerHPBar, 
                 battleUI.UpdateCardQueue, 
                 battleUI.RenderPlayerCostATBBar, 
@@ -52,23 +54,23 @@ namespace LibraryOfSparta.Classes
 
             // Draw enemy
             battleUI.RenderEnemyName(floorData[0], floorData[1]);
-            battleUI.RenderEnemyHPBar(enemy.Hp, enemy.MaxHp);
+            battleUI.RenderEnemyHPBar(Enemy.Hp, Enemy.MaxHp);
             battleUI.RenderEnemyATBBar();
             battleUI.DrawEnemy(Define.IMAGE_PATH + "/Img_" + floorData[2] + ".txt");
 
             battleUI.RenderCardQueue();
-            player.InitDeck();
-            player.AddCardToHand();
-            player.AddCardToHand();
-            player.AddCardToHand();
+            Player.InitDeck();
+            Player.AddCardToHand();
+            Player.AddCardToHand();
+            Player.AddCardToHand();
 
             // battleUI status
-            battleUI.RenderPlayerHPBar(player.Hp, player.MaxHp);
-            battleUI.RenderPlayerStatus(player);
-            battleUI.RenderPlayerBuffStatus(player.BuffList, player.DebuffList, player.buffData);
+            battleUI.RenderPlayerHPBar(Player.Hp, Player.MaxHp);
+            battleUI.RenderPlayerStatus(Player);
+            battleUI.RenderPlayerBuffStatus(Player.BuffList, Player.DebuffList, Player.buffData);
             UpdateEmotion();
 
-            enemy.SetPattern();
+            Enemy.SetPattern();
 
             switch(battleIndex)
             {
@@ -81,13 +83,29 @@ namespace LibraryOfSparta.Classes
             }
 
             Core.PlaySFX(Define.SFX_PATH + "/" + floorData[2] + "_Enter.wav");
+
+            int phase = int.Parse(floorData[7]);
+
+            if(phase == 0)
+            {
+                multiPhase = false;
+            }
+            else
+            {
+                multiPhase = true;
+            }
         }
 
         public void UpdateEmotion()
         {
-            battleUI.RenderEmotionLevel(player.Emotion, enemy.Emotion, player.Token, enemy.Token);
+            battleUI.RenderEmotionLevel(Player.Emotion, Enemy.Emotion, Player.Token, Enemy.Token);
 
-            if (player.Emotion >= enemy.Emotion)
+            if(phaseChanged == true)
+            {
+                return;
+            }
+
+            if (Player.Emotion >= Enemy.Emotion)
             {
                 if (isPlayerWinning == false)
                 {
@@ -123,19 +141,19 @@ namespace LibraryOfSparta.Classes
                 {
                     case ConsoleKey.NumPad1 :
                     case ConsoleKey.D1 :
-                        player.CastCard(0, enemy, cardData);
+                        Player.CastCard(0, Enemy, cardData);
                         break;
                     case ConsoleKey.NumPad2:
                     case ConsoleKey.D2 :
-                        player.CastCard(1, enemy, cardData);
+                        Player.CastCard(1, Enemy, cardData);
                         break;
                     case ConsoleKey.NumPad3:
                     case ConsoleKey.D3 :
-                        player.CastCard(2, enemy, cardData);
+                        Player.CastCard(2, Enemy, cardData);
                         break;
                     case ConsoleKey.NumPad4:
                     case ConsoleKey.D4 :
-                        player.CastCard(3, enemy, cardData);
+                        Player.CastCard(3, Enemy, cardData);
                         break;
                     case ConsoleKey.Escape:
                         Core.LoadScene(8);
@@ -152,50 +170,50 @@ namespace LibraryOfSparta.Classes
 
             if (isPlayer == true)
             {
-                int currentPhase = rules[player.Emotion];
+                int currentPhase = rules[Player.Emotion];
 
-                if (player.Emotion == 5)
+                if (Player.Emotion == 5)
                 {
                     return;
                 }
 
-                player.Token += value;
+                Player.Token += value;
 
-                if (player.Token == 5)
+                if (Player.Token == 5)
                 {
-                    player.Token = 0;
-                    player.Emotion++;
+                    Player.Token = 0;
+                    Player.Emotion++;
                 }
 
-                if(currentPhase != rules[player.Emotion])
+                if(currentPhase != rules[Player.Emotion] && phaseChanged == false)
                 {
                     isPlayerWinning = true;
                     Core.PauseEnemyBGM();
-                    Core.PlayPlayerBGM(Define.BGM_PATH + "/" + floorData[2] + "_" + rules[player.Emotion] + ".wav");
+                    Core.PlayPlayerBGM(Define.BGM_PATH + "/" + floorData[2] + "_" + rules[Player.Emotion] + ".wav");
                 }
             }
             else
             {
-                int currentPhase = rules[enemy.Emotion];
+                int currentPhase = rules[Enemy.Emotion];
 
-                if (enemy.Emotion == 5)
+                if (Enemy.Emotion == 5)
                 {
                     return;
                 }
 
-                enemy.Token += value;
+                Enemy.Token += value;
 
-                if (enemy.Token == 5)
+                if (Enemy.Token == 5)
                 {
-                    enemy.Token = 0;
-                    enemy.Emotion++;
+                    Enemy.Token = 0;
+                    Enemy.Emotion++;
                 }
 
-                if (currentPhase != rules[enemy.Emotion])
+                if (currentPhase != rules[Enemy.Emotion] && phaseChanged == false)
                 {
                     isPlayerWinning = false;
                     Core.PausePlayerBGM();
-                    Core.PlayEnemyBGM(Define.BGM_PATH + "/" + "Enemy_" + rules[enemy.Emotion] + ".wav");
+                    Core.PlayEnemyBGM(Define.BGM_PATH + "/" + "Enemy_" + rules[Enemy.Emotion] + ".wav");
                 }
             }
 
@@ -204,19 +222,39 @@ namespace LibraryOfSparta.Classes
 
         public void Update()
         {
-            player.UpdatePlayerCost();
-            player.UpdatePlayerDraw();
-            enemy.UpdateEnemyATB(player);
+            Player.UpdatePlayerCost();
+            Player.UpdatePlayerDraw();
+            Enemy.UpdateEnemyATB(Player);
             PlayerInput();
 
-            if(player.Hp <= 0)
+            if(multiPhase == true && Enemy.Hp <= (Enemy.MaxHp * 0.5) && phaseChanged == false)
+            {
+                phaseChanged = true;
+
+                switch(Floor)
+                {
+                    case 6:
+                        battleUI.DrawEnemy(Define.IMAGE_PATH + "/Img_Gebura2.txt");
+                        battleUI.RenderEnemyName("컴파일러의 층 6F", "데미갓 박종민 매니저");
+                        floorData[1] = "데미갓 박종민 매니저";
+                        Core.PlayPlayerBGM(Define.BGM_PATH + "/Gebura_3.wav");
+                        Core.PlaySFX(Define.SFX_PATH + "/Gebura2nd.wav");
+                        Core.PlaySFX(Define.SFX_PATH + "/Keter_9.wav");
+                        Enemy.SetNewPattern("29_30_31_32_33_34_31_34_30_34_33_32_30_34_34_32");
+                        break;
+                    case 10:
+                        break;
+                }
+            }
+
+            if(Player.Hp <= 0)
             {
                 Core.StopEnemyBGM();
                 Core.PlaySFX(Define.SFX_PATH + "/" + floorData[2] + "_Defeat.wav");
                 Core.PlaySFX(Define.SFX_PATH + "/Dead.wav");
                 Core.LoadScene(9);
             }
-            else if(enemy.Hp <= 0)
+            else if(Enemy.Hp <= 0)
             {
                 Core.StopPlayerBGM();
                 Core.StopEnemyBGM();
@@ -227,7 +265,7 @@ namespace LibraryOfSparta.Classes
 
         public int GetEnemyEmotionLevel()
         {
-            return enemy.Emotion;
+            return Enemy.Emotion;
         }
     }
 }

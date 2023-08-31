@@ -49,7 +49,7 @@ namespace LibraryOfSparta.Classes
         Action<List<int>, List<int>, string[]>                      buffListener     = (default);
         Action<Player>                                              statusListner    = (default);
         public string[] buffData;
-
+        bool counter = false;
 
         public Player(Action<int, int> hpAction, 
             Action<List<int>, Player> drawAction, 
@@ -67,6 +67,53 @@ namespace LibraryOfSparta.Classes
             buffListener = buffAction;
             statusListner = statusAction;
             buffData = Core.GetData(Define.P_BUFF_DATA_PATH).Split('\n');
+        }
+
+        public int GetStrBuffValue()
+        {
+            int str = 0;
+
+            string pBuffData = Core.GetData(Define.P_BUFF_DATA_PATH);
+            string[] lines = pBuffData.Split('\n');
+
+            Queue<int> queue = new Queue<int>(BuffList);
+            Queue<int> Debuffqueue = new Queue<int>(DebuffList);
+
+            for (int i = 0; i < BuffList.Count; i++)
+            {
+                int element = queue.Dequeue();
+                string[] buffData = lines[element].Split(',');
+                PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
+
+                if (type == PlayerBuffType.힘_버프)
+                {
+                    str += int.Parse(buffData[2]);
+
+                }
+                else
+                {
+                    queue.Enqueue(element);
+                }
+            }
+
+            for (int i = 0; i < DebuffList.Count; i++)
+            {
+                int element = Debuffqueue.Dequeue();
+                string[] buffData = lines[element].Split(',');
+                PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
+
+                if (type == PlayerBuffType.힘_디버프)
+                {
+                    str -= int.Parse(buffData[2]);
+
+                }
+                else
+                {
+                    Debuffqueue.Enqueue(element);
+                }
+            }
+
+            return str;
         }
 
         public int GetStr(bool erase)
@@ -142,7 +189,12 @@ namespace LibraryOfSparta.Classes
                 string[] buffData = lines[element].Split(',');
                 PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
 
-                if (type == PlayerBuffType.방어)
+                if(type == PlayerBuffType.반격)
+                {
+                    counter = true;
+                }
+
+                if (type == PlayerBuffType.방어 || type == PlayerBuffType.반격)
                 {
                     def += int.Parse(buffData[2]);
 
@@ -192,6 +244,27 @@ namespace LibraryOfSparta.Classes
             return dodgeValue;
         }
 
+        public int GetFcs()
+        {
+            string pBuffData = Core.GetData(Define.P_BUFF_DATA_PATH);
+            string[] lines = pBuffData.Split('\n');
+
+            int fcsValue = 0;
+
+            for (int i = 0; i < BuffList.Count; i++)
+            {
+                string[] buffData = lines[BuffList[i]].Split(',');
+                PlayerBuffType type = (PlayerBuffType)int.Parse(buffData[1]);
+
+                if (type == PlayerBuffType.해제불가_집중_버프)
+                {
+                    fcsValue += int.Parse(buffData[2]);
+                }
+            }
+
+            return fcsValue;
+        }
+
         public bool OnHit(int damage)
         {
             int dodgeValue = GetDodge();
@@ -200,6 +273,7 @@ namespace LibraryOfSparta.Classes
             {
                 Core.PlaySFX(Define.SFX_PATH + "/Evade.wav");
                 dialogListener("", "", "", 0, BattleSitulation.EVADE);
+                ((Battle)Core.CurrentScene).AddToken(true, 1);
                 UpdatePlayerUI();
                 return false;
             }
@@ -207,10 +281,21 @@ namespace LibraryOfSparta.Classes
             {
                 int defValue = GetDef(true);
                 int damageValue = damage;
-
+                
                 if (defValue != 0)
                 {
-                    Core.PlaySFX(Define.SFX_PATH + "/Defense.wav");
+                    if(counter == true)
+                    {
+                        counter = false;
+                        Core.PlaySFX(Define.SFX_PATH + "/Counter.wav");
+                        ((Battle)Core.CurrentScene).Enemy.OnHit(defValue);
+                        dialogListener("", ((Battle)Core.CurrentScene).floorData[1], "", damageValue, BattleSitulation.COUNTER);
+                    }
+                    else
+                    {
+                        Core.PlaySFX(Define.SFX_PATH + "/Defense.wav");
+                    }
+
                     damageValue = (defValue + Emotion) - damage;
 
                     if(damageValue < 0)
@@ -221,11 +306,12 @@ namespace LibraryOfSparta.Classes
                     {
                         damageValue = 0;
                         dialogListener("", "","", damageValue, BattleSitulation.DEF);
+                        ((Battle)Core.CurrentScene).AddToken(true, 1);
                         UpdatePlayerUI();
                         return false;
                     }
-                    dialogListener("", "","", damageValue, BattleSitulation.DEF);
                     Hp -= damageValue;
+                    dialogListener("", "","", damageValue, BattleSitulation.DEF);
                     UpdatePlayerUI();
                     return false;
                 }
@@ -247,6 +333,8 @@ namespace LibraryOfSparta.Classes
 
         public void CastCard(int index, Enemy enemy, string[] cardData)
         {
+            UpdatePlayerUI();
+
             if (PlayerHands.Count <= index)
             {
                 Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
@@ -334,7 +422,6 @@ namespace LibraryOfSparta.Classes
                 {
                     Core.PlaySFX(Define.SFX_PATH + "/Card_Lock.wav");
                 }
-                drawListener(PlayerHands, this);
                 UpdatePlayerUI();
             }
         }
@@ -493,6 +580,8 @@ namespace LibraryOfSparta.Classes
             {
                 PlayerCost = 10;
             }
+
+            UpdatePlayerUI();
         }
 
         public void UpdatePlayerCost()
@@ -502,7 +591,7 @@ namespace LibraryOfSparta.Classes
                 return;
             }
 
-            PlayerCostFilled += Spd / 5;
+            PlayerCostFilled += (Spd+Emotion) / 5;
 
             if (PlayerCostFilled >= 31)
             {
@@ -514,7 +603,7 @@ namespace LibraryOfSparta.Classes
 
         public void UpdatePlayerDraw()
         {
-            PlayerDrawFilled += Fcs / 10;
+            PlayerDrawFilled += (Fcs + GetFcs() + Emotion) / 10;
 
             if (PlayerDrawFilled >= 31)
             {

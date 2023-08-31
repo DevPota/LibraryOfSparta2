@@ -1,12 +1,12 @@
 NAME,POWER,TYPE,BUFF,SPEED,SFX_BEFORE,SFX_AFTER
 TIL,0,4,3,10,-1,/Malkuth_0.wav
-작성하셨나요?,3,1,-1,15,-1,/Malkuth_1.wav
+작성하셨나요?,5,1,-1,15,-1,/Malkuth_1.wav
 여러분 잘들리시나요?,10,1,-1,20,-1,/Malkuth_2.wav
 음악을 바꿔보죠,0,1,-1,10,/Yesod_0.wav,-1
 이건 어떻습니까?,10,2,8,30,/Yesod_1.wav,/YesodSpecial.wav
-반갑군,10,1,-1,30,/Yesod_2.wav,/FingerTip.wav
+반갑군,15,1,-1,30,/Yesod_2.wav,/FingerTip.wav
 또 와라,100,3,-1,40,/Yesod_3.wav,/YesodSpecial2.wav
-Git Init,0,0,-1,30,/Hod_0.wav,-1
+Git Init,0,10,-1,30,/Hod_0.wav,-1
 Git Add,0,1,-1,25,/Hod_1.wav,/GitAdd.wav
 Git Commit,20,1,-1,30,/Hod_2.wav,/GitCommit.wav
 Merge Conflict,50,1,-1,50,/Hod_3.wav,/Merge.wav
@@ -23,11 +23,17 @@ Void Update(),8,1,-1,10,-1,/Tiphereth_2.wav
 Void Update(),6,1,-1,10,-1,/Tiphereth_4.wav
 Void Update(),10,1,-1,10,-1,/Tiphereth_3.wav
 Void LateUpdate(),50,8,-1,50,-1,/Tiphereth_5.wav
-벡터 후리기,20,1,-1,20,/Gebura_0.wav,/Blunt_0.wav
-행렬 전개,0,1,-1,30,/Gebura_1.wav,-1
-선형 회귀,0,2,15,20,-1,/Gebura_2.wav
-엡실론 델타 논법,50,5,15_15,60,-1,/Gebura_3.wav
--1=e^pie*i,50,5,16_16,60,-1,/Gebura_4.wav
+컴파일러 가속,0,10,19,20,-1,/Gebura_0.wav
+전처리,0,2,-1,30,-1,/Gebura_1.wav
+어휘 분석,20,2,15,20,-1,/Gebura_4.wav
+구문 분석,20,13,25_25,60,-1,/Gebura_2.wav
+의미 분석,50,14,25_25,60,-1,/Gebura_3.wav
+코드 생성,0,12,-1,20,-1,/Gebura_0.wav
+1001011,35,13,25,50,-1,/Gebura_2.wav
+1101110,0,14,25,50,-1,/Gebura_3.wav
+1010111,30,14,25,50,-1,/Gebura_3.wav
+1111111,30,14,25,50,-1,/Gebura_3.wav
+1000000,0,13,25,50,-1,/Gebura_2.wav
 버텍스 셰이더,0,0,-1,5,-1,/Chesed_0.wav
 픽셀 셰이더(적),0,0,-1,5,-1,/Chesed_1.wav
 픽셀 셰이더(녹),0,0,-1,5,-1,/Chesed_1.wav
