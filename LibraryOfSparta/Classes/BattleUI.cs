@@ -15,7 +15,8 @@ namespace LibraryOfSparta.Classes
         DEFEAT,
         EVADE,
         DEF,
-        HEAL
+        HEAL,
+        COUNTER
     }
 
     public class BattleUI
@@ -171,15 +172,16 @@ namespace LibraryOfSparta.Classes
             int x = 3;
             int y = 8;
             int endY = 29;
+            string blank = "                                                                      ";
 
             string img = File.ReadAllText(path);
 
             string[] lines = img.Split('\n');
 
-            Console.SetCursorPosition(x, y);
-
             for (int i = 0; i < endY - y; i++)
             {
+                Console.SetCursorPosition(x, y + i);
+                Console.Write(blank);
                 Console.SetCursorPosition(x, y + i);
                 Console.Write(lines[i]);
             }
@@ -431,6 +433,12 @@ namespace LibraryOfSparta.Classes
                     Console.SetCursorPosition(x, y + 1);
                     Console.Write(blank);
                     break;
+                case BattleSitulation.COUNTER:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("{0}는 {1} 반격 대미지를 받았다!", target, power);
+                    Console.SetCursorPosition(x, y + 1);
+                    Console.Write(blank);
+                    break;
                 default:
                     break;
             }
@@ -454,7 +462,7 @@ namespace LibraryOfSparta.Classes
             Console.Write(blank);
             Console.SetCursorPosition(x, y + 2);
 
-            int strBuffValue = player.GetStr(false);
+            int strBuffValue = player.GetStrBuffValue();
             Console.Write("✊ 힘   : {0} + {1} + {2} ({3})", player.Str, player.Emotion, strBuffValue,  player.Str + player.Emotion + strBuffValue);
             Console.SetCursorPosition(x, y + 3);
             Console.Write(blank);
@@ -469,7 +477,7 @@ namespace LibraryOfSparta.Classes
             Console.SetCursorPosition(x, y + 5);
             Console.Write(blank);
             Console.SetCursorPosition(x, y + 5);
-            Console.Write("心 집중 : {0} + {1} + {2} ({3})", player.Fcs, player.Emotion, 0, player.Fcs + player.Emotion);
+            Console.Write("心 집중 : {0} + {1} + {2} ({3})", player.Fcs, player.Emotion, player.GetFcs(), player.Fcs + player.Emotion + player.GetFcs());
         }
 
         public void RenderPlayerBuffStatus(List<int> buffList, List<int> debuffList, string[] buffData)
