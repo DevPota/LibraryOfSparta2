@@ -333,6 +333,7 @@ namespace LibraryOfSparta.Classes
                 {
                     if(defValue < 0)
                     {
+                        counter = false;
                         Hp += defValue - damage;
                         dialogListener(((Battle)Core.CurrentScene).floorData[1], "당신", "", defValue + damage, BattleSitulation.ATK);
                         UpdatePlayerUI();
@@ -696,6 +697,28 @@ namespace LibraryOfSparta.Classes
             {
                 Deck.Add(element);
             }
+            
+            foreach(int hand in PlayerHands)
+            {
+                for(int i = 0; i < Deck.Count; i++)
+                {
+                    if (Deck[i] == hand)
+                    {
+                        Deck[i] = -1;
+                        break;
+                    }
+                }
+            }
+            Queue<int> que = new Queue<int>();
+
+            foreach(int deckCards in Deck)
+            {
+                if(deckCards != -1)
+                {
+                    que.Enqueue(deckCards);
+                }
+            }
+            Deck = new List<int>(que);
 
             Random random = new Random();
 
