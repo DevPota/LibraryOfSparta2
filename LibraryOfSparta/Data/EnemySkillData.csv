@@ -1,5 +1,5 @@
 NAME,POWER,TYPE,BUFF,SPEED,SFX_BEFORE,SFX_AFTER
-TIL,0,4,3,10,-1,/Malkuth_0.wav
+TIL,1,4,3,10,-1,/Malkuth_0.wav
 작성하셨나요?,5,1,-1,15,-1,/Malkuth_1.wav
 여러분 잘들리시나요?,10,1,-1,20,-1,/Malkuth_2.wav
 음악을 바꿔보죠,0,1,-1,10,/Yesod_0.wav,-1
@@ -9,10 +9,10 @@ TIL,0,4,3,10,-1,/Malkuth_0.wav
 Git Init,0,10,-1,30,/Hod_0.wav,-1
 Git Add,0,1,-1,25,/Hod_1.wav,/GitAdd.wav
 Git Commit,20,1,-1,30,/Hod_2.wav,/GitCommit.wav
-Merge Conflict,50,1,-1,50,/Hod_3.wav,/Merge.wav
+Merge Conflict,40,1,-1,50,/Hod_3.wav,/Merge.wav
 HelloWorld!,1,1,-1,30,-1,/Netzach_0.wav
-ForceQuit,80,1,-1,100,-1,/Netzach_1.wav
-Debug,10,1,-1,10,-1,/Netzach_2.wav
+ForceQuit,60,1,-1,100,-1,/Netzach_1.wav
+Debug,8,1,-1,10,-1,/Netzach_2.wav
 대단하시군요,5,2,14_14_14_14_14_14_14_14_14_14,20,-1,/Netzach_3.wav
 Void Awake(),0,10,17_17_17_17_17_17_17_17_17_17,30,-1,/Tiphereth_0.wav
 Void Start(),0,11,18_18_18_18_18_18_18_18_18_18,30,-1,/Tiphereth_1.wav
