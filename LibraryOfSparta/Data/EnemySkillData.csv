@@ -2,3 +2,46 @@ NAME,POWER,TYPE,BUFF,SPEED,SFX_BEFORE,SFX_AFTER
 TIL,0,0,3,10,-1,/Malkuth_0.wav
 작성하셨나요?,3,1,-1,15,-1,/Malkuth_1.wav
 여러분 잘들리시나요?,10,1,-1,20,-1,/Malkuth_2.wav
+음악을 바꿔보죠,0,1,-1,10,/Yesod_0.wav,-1
+이건 어떻습니까?,5,2,8,30,/Yesod_1.wav,/YesodSpecial.wav
+반갑군,10,2,8,30,/Yesod_2.wav,/FingerTip.wav
+또 와라,100,3,-1,40,/Yesod_3.wav,/YesodSpecial2.wav
+Git Init,0,0,-1,30,/Hod_0.wav,-1
+Git Add,0,1,-1,25,/Hod_1.wav,/GitAdd.wav
+Git Commit,20,1,-1,30,/Hod_2.wav,/GitCommit.wav
+Merge Conflict,50,1,-1,50,/Hod_3.wav,/Merge.wav
+HelloWorld!,0,0,-1,10,-1,/Netzach_0.wav
+ForceQuit,0,0,-1,30,/Netzach_1.wav,-1
+Debug,0,0,-1,10,/Netzach_2.wav,-1
+대단하시군요,0,0,-1,5,/Netzach_3.wav,-1
+Void Awake(),0,0,-1,5,/Tiphereth_0.wav,-1
+Void Start(),0,0,-1,5,/Tiphereth_1.wav,-1
+Void Update(),0,0,-1,5,-1,-1
+Void Update(),0,0,-1,5,-1,-1
+Void Update(),0,0,-1,5,-1,-1
+Void LateUpdate(),0,0,-1,5,-1,-1
+벡터 후리기,0,0,-1,5,-1,/Gebura_0.wav
+행렬 전개,0,0,-1,5,-1,/Gebura_1.wav
+선형 회귀,0,0,-1,5,-1,/Gebura_2.wav
+엡실론 델타 논법,0,0,-1,5,-1,/Gebura_3.wav
+-1=e^pie*i,0,0,-1,5,-1,/Gebura_4.wav
+버텍스 셰이더,0,0,-1,5,-1,/Chesed_0.wav
+픽셀 셰이더(적),0,0,-1,5,-1,/Chesed_1.wav
+픽셀 셰이더(녹),0,0,-1,5,-1,/Chesed_1.wav
+픽셀 셰이더(청),0,0,-1,5,-1,/Chesed_1.wav
+레스터라이즈,0,0,-1,5,-1,/Chesed_2.wav
+배열,0,0,-1,5,-1,/Binah_0.wav
+스택,0,0,-1,5,-1,/Binah_1.wav
+링크드리스트,0,0,-1,5,-1,/Binah_2.wav
+트리,0,0,-1,5,-1,/Binah_3.wav
+퀵 정렬,0,0,-1,5,-1,/Hokma_0.wav
+다이나믹 프로그래밍,0,0,-1,5,-1,/Hokma_1.wav
+다이나믹 프로그래밍,0,0,-1,5,-1,/Hokma_1.wav
+다이나믹 프로그래밍,0,0,-1,5,-1,/Hokma_1.wav
+이분탐색,0,0,-1,5,-1,/Hokma_2.wav
+맞왜틀?,0,0,-1,5,-1,/Hokma_3.wav
+선빵필승!,0,0,-1,5,-1,/Keter_0.wav
+안녕하세요?,0,0,-1,5,-1,/Keter_1.wav
+캠 켜주세요,0,0,-1,5,-1,/Keter_2.wav
+스파르타 내일배움캠프,0,0,-1,5,-1,/Keter_3.wav
+스파르타 내일배움캠프?,0,0,-1,5,-1,/Keter_4.wav

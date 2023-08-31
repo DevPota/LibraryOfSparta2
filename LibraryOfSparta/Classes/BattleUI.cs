@@ -201,7 +201,7 @@ namespace LibraryOfSparta.Classes
             }
         }
 
-        public void UpdateCardQueue(List<int> hands)
+        public void UpdateCardQueue(List<int> hands, Player player)
         {
             int x = 82;
             int endY = 20;
@@ -211,6 +211,7 @@ namespace LibraryOfSparta.Classes
             string cardFrame = new string('─', 16);
 
             string blank = "                 ";
+            string smallBlank = "       ";
 
             for(int i = 0; i < 4; i++)
             {
@@ -223,7 +224,7 @@ namespace LibraryOfSparta.Classes
                 Console.SetCursorPosition(x + 2, handStart - 3);
                 Console.Write(blank);
                 Console.SetCursorPosition(x + 22, handStart - 1);
-                Console.Write(blank);
+                Console.Write(smallBlank);
                 handStart -= 4;
             }
 
@@ -232,11 +233,12 @@ namespace LibraryOfSparta.Classes
             for (int i = 0; i < hands.Count; i++)
             {
                 string[] temp = cardDataLines[hands[i]].Split(',');
+                int cost = int.Parse(temp[3]);
 
                 Console.SetCursorPosition(x + 2, handStart);
                 Console.Write(cardFrame);
                 Console.SetCursorPosition(x + 2, handStart - 1);
-                Console.Write(temp[3]);
+                Console.Write(cost);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.SetCursorPosition(x + 2, handStart - 2);
                 Console.Write(temp[0]);
@@ -244,7 +246,14 @@ namespace LibraryOfSparta.Classes
                 Console.SetCursorPosition(x + 2, handStart - 3);
                 Console.Write(cardFrame);
                 Console.SetCursorPosition(x + 22, handStart - 1);
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                if(cost <= player.PlayerCost)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
                 Console.Write("[{0}]", 1 + i);
                 Console.ResetColor();
                 handStart -= 4;
@@ -543,13 +552,20 @@ namespace LibraryOfSparta.Classes
             Console.SetCursorPosition(x, y + 4);
             Console.Write('|');
             Console.ForegroundColor = ConsoleColor.Green;
-            for (int i = 0; i < pToken; i++)
+            int length = pToken;
+
+            if(pToken > 5)
+            {
+                length = 0;
+            }
+
+            for (int i = 0; i < length; i++)
             {
                 Console.SetCursorPosition((x+1) + (i * token.Length), y + 4);
                 Console.Write(token);
             }
             Console.ResetColor();
-            for(int i = pToken; i < barLength; i++)
+            for(int i = length; i < barLength; i++)
             {
                 Console.SetCursorPosition((x+1) + (i * token.Length), y + 4);
                 Console.Write(empty);
@@ -580,7 +596,7 @@ namespace LibraryOfSparta.Classes
             Console.Write('|');
 
             Console.SetCursorPosition(x, y + 12);
-            Console.Write("A. 입구로 돌아가기");
+            Console.Write("[ESC] 입구로 돌아가기");
         }
     }
 }

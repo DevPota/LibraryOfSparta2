@@ -137,13 +137,16 @@ namespace LibraryOfSparta.Classes
                     case ConsoleKey.D4 :
                         player.CastCard(3, enemy, cardData);
                         break;
+                    case ConsoleKey.Escape:
+                        Core.LoadScene(8);
+                        return;
                 }
             }
 
             Core.ReleaseKey();
         }
 
-        public void AddToken(bool isPlayer)
+        public void AddToken(bool isPlayer, int value)
         {
             int[] rules = { 0, 0, 1, 1, 1, 2 };
 
@@ -156,7 +159,7 @@ namespace LibraryOfSparta.Classes
                     return;
                 }
 
-                player.Token++;
+                player.Token += value;
 
                 if (player.Token == 5)
                 {
@@ -179,7 +182,7 @@ namespace LibraryOfSparta.Classes
                     return;
                 }
 
-                enemy.Token++;
+                enemy.Token += value;
 
                 if (enemy.Token == 5)
                 {
@@ -209,7 +212,7 @@ namespace LibraryOfSparta.Classes
                 Core.StopEnemyBGM();
                 Core.PlaySFX(Define.SFX_PATH + "/" + floorData[2] + "_Defeat.wav");
                 Core.PlaySFX(Define.SFX_PATH + "/Dead.wav");
-                Core.LoadScene(4);
+                Core.LoadScene(9);
             }
             else if(enemy.Hp <= 0)
             {

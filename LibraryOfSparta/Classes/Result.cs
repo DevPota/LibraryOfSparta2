@@ -209,7 +209,7 @@ namespace LibraryOfSparta
                         d.Erase(Define.SCREEN_X - 75, 22, 20, 7);
                         int random_number2 = rand.Next(0, 9);
                         Console.SetCursorPosition(Define.SCREEN_X - 83, 25);
-                        Console.Write($"{GetCardName(cardDataLines, rewardList[i])} - {GetCardInfo(cardDataLines, rewardList[0])}");
+                        Console.Write($"{GetCardName(cardDataLines, rewardList[i])} - {GetCardInfo(cardDataLines, rewardList[i])}");
 
                         Console.SetCursorPosition(Define.SCREEN_X - 75, 41);
                         Console.Write("보너스 카드 획득");
