@@ -65,11 +65,11 @@ namespace LibraryOfSparta.Classes
 
             //페이드인아웃 애니메이션
             AnimationCursor = 0;
-            Logo Keter = new Logo(60, 20, "title_Keter2");
+            Logo Keter = new Logo(60, 20, "title_Keter");
             Logo Malkuth = new Logo(25, 20, "title_Malkuth");
             Logo Binah = new Logo(60, 20, "title_Binah");
             Logo Chesed = new Logo(25, 20, "title_Chesed");
-            Logo Gebura = new Logo(60, 20, "title_Gebura");
+            Logo Gebura = new Logo(60, 20, "title_Gebura_short");
             Logo Hod = new Logo(25, 20, "title_Hod");
             Logo Hokma = new Logo(60, 20, "title_Hokma");
             Logo Netzach = new Logo(25, 20, "title_Netzach");

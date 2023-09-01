@@ -99,7 +99,7 @@ namespace LibraryOfSparta.Classes
             //팀원 역할
             role_1 = new Logo(1, 10, "img_HaeChanKim_Role");
             role_1_anim = new LogoAnimation(role_1);
-            role_2 = new Logo(80, 10, "img_HongJunLee_Role");
+            role_2 = new Logo(70, 10, "img_HongJunLee_Role");
             role_2_anim = new LogoAnimation(role_2);
             role_3 = new Logo(1, 10, "img_MinGyuWoo_Role");
             role_3_anim = new LogoAnimation(role_3);

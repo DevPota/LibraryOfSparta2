@@ -51,7 +51,7 @@ namespace LibraryOfSparta.Classes
             Logo Chesed = new Logo(40, 20, "title_Chesed");
             Logo Binah = new Logo(40, 20, "title_Binah");
             Logo Hokma = new Logo(40, 20, "title_Hokma");
-            Logo Keter = new Logo(40, 20, "title_Keter2");
+            Logo Keter = new Logo(40, 20, "title_Keter");
 
             animation0 = new LogoAnimation(Malkuth);
             animation1 = new LogoAnimation(Yesod);
