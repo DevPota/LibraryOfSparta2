@@ -526,6 +526,17 @@ namespace LibraryOfSparta.Classes
                             }
                             hpListener(Hp, MaxHp);
                             break;
+                            case CardType.대검 :
+                            if (CheckMark(PlayerBuffType.공격_표식) == true)
+                            {
+                                Core.PlaySFX(Define.SFX_PATH + "/Hokma_Defeat.wav");
+                                UpdatePlayerUI();
+                                return;
+                            }
+                            ((Battle)Core.CurrentScene).AddToken(true, 1);
+                            dialogListener("당신", ((Battle)Core.CurrentScene).floorData[1], card[0], power + GetStr(false), BattleSitulation.ATK);
+                            enemy.OnHit(power + (GetStr(true) * 3));
+                            break;
                     }
                 }
                 else
@@ -594,6 +605,19 @@ namespace LibraryOfSparta.Classes
                     for (int i = 0; i < power; i++)
                     {
                         PlayerCost--;
+                    }
+                    UpdatePlayerUI();
+                    break;
+                case PlayerBuffType.버린만큼_다시_뽑기:
+                    int length = PlayerHands.Count;
+                    for(int i = 0; i < length; i++)
+                    {
+                        RemoveCardFromHand(0);
+                    }
+
+                    for (int i = 0; i < length; i++)
+                    {
+                        AddCardToHand();
                     }
                     UpdatePlayerUI();
                     break;
