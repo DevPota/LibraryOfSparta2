@@ -177,7 +177,7 @@ namespace LibraryOfSparta
             }
             else
             {
-                if(floorIndex == Core.SaveData.CurrentFloor)
+                if(floorIndex == Core.SaveData.CurrentFloor && floorIndex != 10)
                 {
                     Core.SaveData.CurrentFloor++;
                     Core.Save();
