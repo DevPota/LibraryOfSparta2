@@ -687,6 +687,8 @@ namespace LibraryOfSparta.Classes
             {
                 return false;
             }
+
+            UpdatePlayerUI();
         }
 
         public void InitDeck()
