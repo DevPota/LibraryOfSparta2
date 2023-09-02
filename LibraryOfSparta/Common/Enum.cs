@@ -7,7 +7,8 @@
         공격_자가버프 = 2,
         버프 = 3,
         회복 = 4,
-        대검 = 5
+        대검 = 5,
+        버프_디버프 = 6
     }
 
     public enum PlayerBuffType
