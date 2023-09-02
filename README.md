@@ -3,6 +3,8 @@
 
 Release.7z 압축 해제후 exe 실행
 
+
+
 ATB 덱 빌딩 콘솔 텍스트 RPG
 
 개발 언어 C#
