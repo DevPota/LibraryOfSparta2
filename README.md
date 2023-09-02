@@ -1,6 +1,8 @@
 # 라이브러리 오브 스파르타
 다운로드 https://github.com/DevPota/LibraryOfSparta2/releases/download/1.2.1/Release.7z
 
+Release.7z 압축 해제후 exe 실행
+
 ATB 덱 빌딩 콘솔 텍스트 RPG
 
 개발 언어 C#
