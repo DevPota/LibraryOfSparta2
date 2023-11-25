@@ -1,4 +1,4 @@
-# 라이브러리 오브 스파르타
+# 라이브러리 오브 스파르타 (숙제)
 다운로드 https://github.com/DevPota/LibraryOfSparta2/releases/tag/1.2.2
 
 Release.7z 압축 해제후 exe 실행
